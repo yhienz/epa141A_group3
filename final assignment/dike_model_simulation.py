@@ -4,7 +4,11 @@ from ema_workbench.em_framework.evaluators import perform_experiments
 from ema_workbench.em_framework.samplers import sample_uncertainties
 from ema_workbench.util import ema_logging
 import time
+from ema_workbench import save_results
 from problem_formulation import get_model_for_problem_formulation
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     #    n_scenarios = 5
     #    scenarios = sample_uncertainties(dike_model, 50)
     #    n_policies = 10
-
+    #
     # single run
     #    start = time.time()
     #    dike_model.run_model(ref_scenario, policy0)
@@ -59,9 +63,8 @@ if __name__ == "__main__":
     #    results = dike_model.outcomes_output
 
     # series run
-    experiments, outcomes = perform_experiments(dike_model, ref_scenario, 5)
+    results = perform_experiments(dike_model, 5, 5)
+    experiments, outcomes = results
 
-# multiprocessing
-#    with MultiprocessingEvaluator(dike_model) as evaluator:
-#        results = evaluator.perform_experiments(scenarios=10, policies=policy0,
-#                                                uncertainty_sampling='sobol')
+    save_results(results, 'Experiments/Week22_Open_exploration_PD_5.tar.gz')
+
