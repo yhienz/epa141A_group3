@@ -64,10 +64,10 @@ if __name__ == "__main__":
     #    results = dike_model.outcomes_output
 
     # series run
-    results = perform_experiments(dike_model, 100, 10)
+    results = perform_experiments(dike_model, 100, 25)
     experiments, outcomes = results
     #
     # save_results(results, 'Experiments/Week22_Open_exploration_PD_5.tar.gz')
-    save_results(results, 'Experiments/Week22_Open_exploration_gen_100_10.gz')
+    save_results(results, 'Experiments/Week22_Open_exploration_PD5_100_25.gz')
 
 
