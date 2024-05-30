@@ -3,6 +3,7 @@ from ema_workbench import Model, MultiprocessingEvaluator, Policy, Scenario
 from ema_workbench.em_framework.evaluators import perform_experiments
 from ema_workbench.em_framework.samplers import sample_uncertainties
 from ema_workbench.util import ema_logging
+from ema_workbench import Samplers
 import time
 from ema_workbench import save_results
 from problem_formulation import get_model_for_problem_formulation
@@ -63,8 +64,10 @@ if __name__ == "__main__":
     #    results = dike_model.outcomes_output
 
     # series run
-    results = perform_experiments(dike_model, 5, 5)
+    results = perform_experiments(dike_model, 100, 10)
     experiments, outcomes = results
+    #
+    # save_results(results, 'Experiments/Week22_Open_exploration_PD_5.tar.gz')
+    save_results(results, 'Experiments/Week22_Open_exploration_gen_100_10.gz')
 
-    save_results(results, 'Experiments/Week22_Open_exploration_PD_5.tar.gz')
 
