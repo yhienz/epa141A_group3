@@ -7,15 +7,12 @@ from ema_workbench import Samplers
 import time
 from ema_workbench import save_results
 from problem_formulation import get_model_for_problem_formulation
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
-    dike_model, planning_steps = get_model_for_problem_formulation(5)
+    dike_model, planning_steps = get_model_for_problem_formulation(4)
 
     # Build a user-defined scenario and policy:
     reference_values = {
@@ -50,7 +47,6 @@ if __name__ == "__main__":
         pol0.update({key.name: zero_policy[s2]})
 
     policy0 = Policy("Policy 0", **pol0)
-
     # Call random scenarios or policies:
     #    n_scenarios = 5
     #    scenarios = sample_uncertainties(dike_model, 50)
@@ -64,10 +60,27 @@ if __name__ == "__main__":
     #    results = dike_model.outcomes_output
 
     # series run
-    results = perform_experiments(dike_model, 100, 25)
+
+    #Perform experiments without policies
+    results = perform_experiments(dike_model, scenarios=1000, policies = 10)
+
     experiments, outcomes = results
+
+
+    # from ema_workbench import MultiprocessingEvaluator, ema_logging
+    # from ema_workbench import Samplers
+    # from ema_workbench.em_framework import get_SALib_problem
     #
-    # save_results(results, 'Experiments/Week22_Open_exploration_PD_5.tar.gz')
-    save_results(results, 'Experiments/Week22_Open_exploration_PD5_100_25.gz')
+    # ema_logging.log_to_stderr(ema_logging.INFO)
+    #
+    # with MultiprocessingEvaluator(dike_model, n_processes=-2) as evaluator:
+    #      results_sobol = evaluator.perform_experiments(100, policies=5,
+    #                                                          uncertainty_sampling=Samplers.SOBOL)
+
+    #experiments_sobol, outcomes_sobol = results_sobol
+    #
+    #
+    save_results(results, 'Experiments/Week22_Open_exploration_1000_10.tar.gz')
+    #save_results(results_sobol, 'Experiments/Week22_Open_exploration_Sobol_1000_noP.tar.gz')
 
 
