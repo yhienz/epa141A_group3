@@ -60,27 +60,23 @@ if __name__ == "__main__":
     #    results = dike_model.outcomes_output
 
     # series run
-
-    #Perform experiments without policies
-    results = perform_experiments(dike_model, scenarios=1000, policies = 10)
-
-    experiments, outcomes = results
-
-
-    # from ema_workbench import MultiprocessingEvaluator, ema_logging
-    # from ema_workbench import Samplers
-    # from ema_workbench.em_framework import get_SALib_problem
     #
-    # ema_logging.log_to_stderr(ema_logging.INFO)
+    # #Perform experiments without policies
+    # results = perform_experiments(dike_model, scenarios=100, policies = 10)
     #
-    # with MultiprocessingEvaluator(dike_model, n_processes=-2) as evaluator:
-    #      results_sobol = evaluator.perform_experiments(100, policies=5,
-    #                                                          uncertainty_sampling=Samplers.SOBOL)
+    # experiments, outcomes = results
+
+
+    from ema_workbench import MultiprocessingEvaluator, ema_logging
+    ema_logging.log_to_stderr(ema_logging.INFO)
+
+    with MultiprocessingEvaluator(dike_model, n_processes=-1) as evaluator:
+         results = evaluator.perform_experiments(100, policies=10)
 
     #experiments_sobol, outcomes_sobol = results_sobol
     #
     #
-    save_results(results, 'Experiments/Week22_Open_exploration_1000_10.tar.gz')
+    save_results(results, 'Experiments/Week22_Open_exploration_1000_20.tar.gz')
     #save_results(results_sobol, 'Experiments/Week22_Open_exploration_Sobol_1000_noP.tar.gz')
 
 
