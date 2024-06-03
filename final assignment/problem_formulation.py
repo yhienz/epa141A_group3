@@ -27,7 +27,6 @@ def sum_over(*args):
 
     return sum(numbers)
 
-
 def sum_over_time(*args):
     data = np.asarray(args)
     summed = data.sum(axis=0)
@@ -369,6 +368,36 @@ def get_model_for_problem_formulation(problem_formulation_id):
         outcomes.append(ArrayOutcome("RfR Total Costs"))
         outcomes.append(ArrayOutcome("Expected Evacuation Costs"))
         dike_model.outcomes = outcomes
+
+    # New PF
+    elif problem_formulation_id == 6:
+        cost_variables = []
+        cost_variables.extend(
+            [
+                f"{dike}_{e}"
+                for e in ["Expected Annual Damage", "Dike Investment Costs"]
+                for dike in function.dikelist
+        ])
+        cost_variables.extend([f"RfR Total Costs"])
+        cost_variables.extend([f"Expected Evacuation Costs"])
+        outcomes = []
+
+        for dike in function.dikelist:
+            for entry in [
+                "Expected Annual Damage",
+                "Expected Number of Deaths",
+            ]:
+                o = ArrayOutcome(f"{dike}_{entry}")
+                outcomes.append(o)
+
+        outcomes.append(
+            ScalarOutcome(
+                "All Costs",
+                variable_name=[var for var in cost_variables],
+                function=sum_over
+            ))
+        dike_model.outcomes = outcomes
+
 
     else:
         raise TypeError("unknown identifier")
