@@ -17,7 +17,7 @@ import seaborn as sns
 if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
-    model, steps = get_model_for_problem_formulation(2)
+    model, steps = get_model_for_problem_formulation(6)
 
     reference_values = {
         "Bmax": 175,
@@ -29,6 +29,8 @@ if __name__ == "__main__":
         "ID flood wave shape": 4,
     }
     scen1 = {}
+    model.outcomes.clear()
+
 
     for key in model.uncertainties:
         name_split = key.name.split("_")
@@ -45,7 +47,7 @@ if __name__ == "__main__":
 
     espilon = [1e3] * len(model.outcomes)
 
-    nfe = 200  # proof of principle only, way to low for actual use
+    nfe = 5  # proof of principle only, way to low for actual use
 
     with MultiprocessingEvaluator(model) as evaluator:
         results, convergence = evaluator.optimize(
@@ -55,6 +57,7 @@ if __name__ == "__main__":
             convergence=convergence_metrics,
             reference=ref_scenario,
         )
+
 
     fig, (ax1, ax2) = plt.subplots(ncols=2, sharex=True)
     fig, ax1 = plt.subplots(ncols=1)
