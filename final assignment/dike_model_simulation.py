@@ -71,7 +71,7 @@ if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
     with MultiprocessingEvaluator(dike_model) as evaluator:
-         results = evaluator.perform_experiments(scenarios= 4000, policies=121)
+         results = evaluator.perform_experiments(scenarios= 4000, policies=0)
 
     #experiments_sobol, outcomes_sobol = results_sobol
 
