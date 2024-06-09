@@ -71,12 +71,12 @@ if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
     with MultiprocessingEvaluator(dike_model) as evaluator:
-         results = evaluator.perform_experiments(scenarios= 4000, policies=0)
+         results = evaluator.perform_experiments(scenarios= 3000, policies=100)
 
     #experiments_sobol, outcomes_sobol = results_sobol
 
     #
-    save_results(results, 'Experiments/Week23_Open_Exploration_4000/121_PD6.tar.gz')
+    save_results(results, 'Experiments/Week23_Open_Exploration_4000_PD6.tar.gz')
     #save_results(results_sobol, 'Experiments/Week22_Open_exploration_Sobol_1000_noP.tar.gz')
 
 
