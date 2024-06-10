@@ -390,7 +390,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
             ]:
                 o = ArrayOutcome(f"{dike}_{entry}") #function = sum_over_time, kind = direction)
                 outcomes.append(o)
-               # and change scalar ino arrayoutcome
+               # and change scalar into arrayoutcome
 
         outcomes.append(
             ScalarOutcome(
