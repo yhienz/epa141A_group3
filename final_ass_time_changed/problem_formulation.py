@@ -371,7 +371,6 @@ def get_model_for_problem_formulation(problem_formulation_id):
 
     # New PF
     elif problem_formulation_id == 6:
-       # direction = ScalarOutcome.MINIMIZE
         cost_variables = []
         cost_variables.extend(
             [
@@ -390,15 +389,15 @@ def get_model_for_problem_formulation(problem_formulation_id):
             ]:
                 o = ArrayOutcome(f"{dike}_{entry}") #function = sum_over_time, kind = direction)
                 outcomes.append(o)
-               # and change scalar ino arrayoutcome
 
-        outcomes.append(
-            ScalarOutcome(
-                "All Costs",
-                variable_name=[var for var in cost_variables],
-                function=sum_over #kind = direction
-            ))
-        dike_model.outcomes = outcomes
+
+            outcomes.append(
+                ScalarOutcome(
+                    f"All Costs",
+                    variable_name=[var for var in cost_variables],
+                    function=sum_over
+                ))
+            dike_model.outcomes = outcomes
 
 
     else:
