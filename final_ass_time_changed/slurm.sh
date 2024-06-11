@@ -1,23 +1,26 @@
 #!/bin/sh
 #
-#SBATCH --job-name="Policy_MP"
+#SBATCH --job-name="Policy_MP_GRP3"
 #SBATCH --account=education-tpm-ms-epa
 #SBATCH --mail-user=y.hiensch6@student.tudelft.nl
 #SBATCH --mail-type=all
+#!/bin/bash
 
+#SBATCH --job-name="Python_test"
+#SBATCH --time=00:02:00
+#SBATCH --ntasks=10
+#SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
-#SBATCH --time=
-#SBATCH --ntasks=
-#SBATCH --cpus-per-task=4
-#SBATCH --mem-percpu=4G
+#SBATCH --mem-per-cpu=4GB
+#SBATCH --account=research-tpm-mas
 
 module load 2023r1
 module load openmpi
 module load python
-module py-numpy
-module py-scipy
-module py-mpi4py
-module py-pip
+module load py-numpy
+module load py-scipy
+module load py-mpi4py
+module load py-pip
 
 python -m venv venv
 source venv/bin/activate
@@ -28,4 +31,4 @@ python -m pip install openpyxl
 python -m pip install xlrd
 
 python MORDM.py
-# mpiexec -n 1 python3 MORDM.py
+mpiexec -n 1 python3 MORDM.py
