@@ -16,14 +16,15 @@ from ema_workbench.util import ema_logging
 from ema_workbench import save_results, load_results
 from ema_workbench.em_framework.optimization import (EpsilonProgress)
 
-# Loading in all the 17 objectives via predefined problem formulation 3
-if __name__ == '__main__':
+def initialize_model():
     ema_logging.log_to_stderr(ema_logging.INFO)
+    print("Initializing model...")
     dike_model, planning_steps = get_model_for_problem_formulation(6)
-
+    print("Model initialized.")
+    return dike_model, planning_steps
 
 # Writing a function to create actor specific problem formulations
-def problem_formulation_actor(problem_formulation_actor):
+def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
     # Load the model:
     function = DikeNetwork()
     # workbench model:
@@ -102,71 +103,110 @@ def problem_formulation_actor(problem_formulation_actor):
         raise TypeError('unknown identifier')
     return model
 
-# Deepcopying the uncertainties and levers
-uncertainties = dike_model.uncertainties
-uncertainties = copy.deepcopy(dike_model.uncertainties)
-
-levers = dike_model.levers
-levers = copy.deepcopy(dike_model.levers)
-
-# Setting the reference scenario
-reference_values = {
-    "Bmax": 175,
-    "Brate": 1.5,
-    "pfail": 0.5,
-    "ID flood wave shape": 4,
-    "planning steps": 2,
-}
-reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
-refcase_scen = {}
-
-for key in dike_model.uncertainties:
-    name_split = key.name.split('_')
-    if len(name_split) == 1:
-
-        refcase_scen.update({key.name: reference_values[key.name]})
-    else:
-        refcase_scen.update({key.name: reference_values[name_split[1]]})
-
-ref_scenario = Scenario('reference', **refcase_scen)
-
-############# Overijssel
-model = problem_formulation_actor(6)
-
-# Running the optimization for overrijsel
-# nfe = 50000
-# seed = 10
-# epsilon = 0.1 * len(model.outcomes)
-
-convergence_metrics = {EpsilonProgress()}
-constraint = [Constraint("Total Costs", outcome_names="Total Costs", function=lambda x: max(0, x - 700000000))]
-
-results_df = pd.DataFrame()
-with MultiprocessingEvaluator(model) as evaluator:
-    for _ in range(2):
-        results = evaluator.optimize(nfe=2, searchover='levers',
-                                     convergence=convergence_metrics,
-                                     epsilons=[1] * len(model.outcomes), reference=ref_scenario,
-                                     constraints=constraint)
-
-save_results(results, 'Week23_MORDM_Reference_1000_PD6.tar.gz')
-
-######### Gelderland
-
+### Overijssel
 if __name__ == '__main__':
-    ema_logging.log_to_stderr(ema_logging.INFO)
-    dike_model2, planning_steps2 = get_model_for_problem_formulation(6)
+    dike_model, planning_steps = initialize_model()
 
-model2 = problem_formulation_actor(5)
+    uncertainties = dike_model.uncertainties
+    levers = dike_model.levers
 
-convergence_metrics = {EpsilonProgress()}
-constraint = [Constraint("Total Costs", outcome_names="Total Costs", function=lambda x: max(0, x - 700000000))]
+    # Setting the reference scenario
+    reference_values = {
+        "Bmax": 175,
+        "Brate": 1.5,
+        "pfail": 0.5,
+        "ID flood wave shape": 4,
+        "planning steps": 2,
+    }
+    reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
+    refcase_scen = {}
 
-with MultiprocessingEvaluator(model2) as evaluator:
-    for _ in range(2):
-        results_gel = evaluator.optimize(nfe=2, searchover='levers',
-                                     convergence=convergence_metrics,
-                                     epsilons=[1] * len(model2.outcomes), reference=ref_scenario,
-                                     constraints=constraint)
+    for key in dike_model.uncertainties:
+        name_split = key.name.split('_')
+        if len(name_split) == 1:
+            refcase_scen.update({key.name: reference_values[key.name]})
+        else:
+            refcase_scen.update({key.name: reference_values[name_split[1]]})
 
-save_results(results_gel, 'Week23_MORDM_Reference_1000_PD5.tar.gz')
+    ref_scenario = Scenario('reference', **refcase_scen)
+
+    ######### Overijssel
+    model = problem_formulation_actor(6, uncertainties, levers)
+
+    # Deepcopying the uncertainties and levers
+    uncertainties = copy.deepcopy(dike_model.uncertainties)
+    levers = copy.deepcopy(dike_model.levers)
+
+    # Running the optimization for Overijssel
+    convergence_metrics = {EpsilonProgress()}
+    constraint = [Constraint("Total Costs", outcome_names="Total Costs", function=lambda x: max(0, x - 700000000))]
+
+    results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
+    results_outcomes = pd.DataFrame()
+    with MultiprocessingEvaluator(model) as evaluator:
+        for _ in range(2):
+            (y, t) = evaluator.optimize(nfe=10, searchover='levers',
+                                        convergence=convergence_metrics,
+                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
+                                        constraints=constraint)
+
+            results_epsilon = pd.concat([results_epsilon, t])
+            results_outcomes = pd.concat([results_outcomes, y])
+            print(results_outcomes)
+
+
+    # Save the concatenated DataFrame to a CSV file
+    results_epsilon.to_csv('Week24_MORDM_epsilon_overijssel_PD6.csv', index=False)
+    results_outcomes.to_csv('Week24_MORDM_outcomes_overijssel_PD6.csv', index=False)
+    print("Optimization results saved.")
+
+# ######### Gelderland
+if __name__ == '__main__':
+    dike_model, planning_steps = initialize_model()
+
+    uncertainties = dike_model.uncertainties
+    levers = dike_model.levers
+
+    # Setting the reference scenario
+    reference_values = {
+        "Bmax": 175,
+        "Brate": 1.5,
+        "pfail": 0.5,
+        "ID flood wave shape": 4,
+        "planning steps": 2,
+    }
+    reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
+    refcase_scen = {}
+
+    for key in dike_model.uncertainties:
+        name_split = key.name.split('_')
+        if len(name_split) == 1:
+            refcase_scen.update({key.name: reference_values[key.name]})
+        else:
+            refcase_scen.update({key.name: reference_values[name_split[1]]})
+
+    ref_scenario = Scenario('reference', **refcase_scen)
+
+    ######### Overijssel
+    model2 = problem_formulation_actor(5, uncertainties, levers)
+
+    convergence_metrics = {EpsilonProgress()}
+    constraint = [Constraint("Total Costs", outcome_names="Total Costs", function=lambda x: max(0, x - 700000000))]
+
+    results_epsilon2 = pd.DataFrame()  # Initialize an empty DataFrame
+    results_outcomes2 = pd.DataFrame()
+    with MultiprocessingEvaluator(model2) as evaluator:
+        for _ in range(2):
+            (y, t) = evaluator.optimize(nfe=10, searchover='levers',
+                                        convergence=convergence_metrics,
+                                        epsilons=[0.1] * len(model2.outcomes), reference=ref_scenario,
+                                        constraints=constraint)
+
+            results_epsilon2 = pd.concat([results_epsilon2, t])
+            results_outcomes2 = pd.concat([results_outcomes2, y])
+            print(results_outcomes2)
+
+    # Save the concatenated DataFrame to a CSV file
+    results_epsilon2.to_csv('Week23_MORDM_Gelderland_PD5.csv', index=False)
+    results_outcomes2.to_csv('Week23_MORDM_Gelderland_PD5.csv', index=False)
+
