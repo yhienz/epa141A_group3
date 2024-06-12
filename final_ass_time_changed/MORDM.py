@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
             results_epsilon = pd.concat([results_epsilon, t])
             results_outcomes = pd.concat([results_outcomes, y])
-            print(results_outcomes)
+
 
 
     # Save the concatenated DataFrame to a CSV file
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
             results_epsilon2 = pd.concat([results_epsilon2, t])
             results_outcomes2 = pd.concat([results_outcomes2, y])
-            print(results_outcomes2)
+
 
     # Save the concatenated DataFrame to a CSV file
     results_epsilon2.to_csv('Week23_MORDM_Gelderland_PD5.csv', index=False)
