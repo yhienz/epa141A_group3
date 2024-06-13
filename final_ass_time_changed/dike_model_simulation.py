@@ -21,7 +21,7 @@ if __name__ == "__main__":
         # set pfail to 1 for model validation (getting out stochasticity)
         "pfail": 0.5,
         "ID flood wave shape": 4,
-        "planning steps": 4,
+        "planning steps": 5,
     }
     reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
     scen1 = {}
