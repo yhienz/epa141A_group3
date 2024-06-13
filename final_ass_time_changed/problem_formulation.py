@@ -32,6 +32,11 @@ def sum_over_time(*args):
     summed = data.sum(axis = 0)
     return summed
 
+# def sum_over_adapt(*args):
+#     data= np.asarray(args)
+#     summed= data.sum(axis= 0)
+#     return summed
+
 
 def get_model_for_problem_formulation(problem_formulation_id):
     """Convenience function to prepare DikeNetwork in a way it can be input in the EMA-workbench.
@@ -145,7 +150,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 for dike in function.dikelist
             ]
         )
-
+            #sum over time , sum over
         casualty_variables.extend(
             [
                 f"{dike}_{e}"
@@ -161,7 +166,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
             ScalarOutcome(
                 "All Costs",
                 variable_name=[var for var in cost_variables],
-                function=sum_over,
+                function=sum_over,  #versus sum_overtime
                 kind=direction,
             ),
             ScalarOutcome(
