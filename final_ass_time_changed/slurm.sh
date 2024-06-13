@@ -21,6 +21,7 @@ module load py-pip
 
 python -m venv venv
 source venv/bin/activate
+python -m pip install --upgrade --force-reinstall numpy==1.26.4
 python -m pip install --upgrade ema_workbench
 python -m pip install ipyparallel
 python -m pip install networkx

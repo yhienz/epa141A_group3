@@ -1,7 +1,5 @@
 # Import general python packages
 import pandas as pd
-import numpy as np
-import seaborn as sns
 import copy
 
 # Import functions
@@ -144,10 +142,10 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(2):
-            (y, t) = evaluator.optimize(nfe=10, searchover='levers',
+        for _ in range(10):
+            (y, t) = evaluator.optimize(nfe=50000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
                                         constraints=constraint)
 
             results_epsilon = pd.concat([results_epsilon, t])
@@ -158,7 +156,7 @@ if __name__ == '__main__':
     # Save the concatenated DataFrame to a CSV file
     results_epsilon.to_csv('Week24_MORDM_epsilon_overijssel_PD6.csv', index=False)
     results_outcomes.to_csv('Week24_MORDM_outcomes_overijssel_PD6.csv', index=False)
-    print("Optimization results saved.")
+
 
 # ######### Gelderland
 if __name__ == '__main__':
@@ -190,16 +188,16 @@ if __name__ == '__main__':
     ######### Overijssel
     model2 = problem_formulation_actor(5, uncertainties, levers)
 
-    convergence_metrics = {EpsilonProgress()}
+
     constraint = [Constraint("Total Costs", outcome_names="Total Costs", function=lambda x: max(0, x - 700000000))]
 
     results_epsilon2 = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes2 = pd.DataFrame()
     with MultiprocessingEvaluator(model2) as evaluator:
-        for _ in range(2):
-            (y, t) = evaluator.optimize(nfe=10, searchover='levers',
+        for _ in range(10):
+            (y, t) = evaluator.optimize(nfe=50000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model2.outcomes), reference=ref_scenario,
+                                        epsilons=[0.01] * len(model2.outcomes), reference=ref_scenario,
                                         constraints=constraint)
 
             results_epsilon2 = pd.concat([results_epsilon2, t])
