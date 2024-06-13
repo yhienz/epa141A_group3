@@ -335,7 +335,6 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 function=sum_over_time,
             )
         )
-
         outcomes.append(
             ArrayOutcome(
                 f"Expected Number of Deaths",
@@ -371,40 +370,47 @@ def get_model_for_problem_formulation(problem_formulation_id):
 
     # New PF
     elif problem_formulation_id == 6:
-        cost_variables = []
-        cost_variables.extend(
-            [
-                f"{dike}_{e}"
-                for e in ["Expected Annual Damage", "Dike Investment Costs"]
-                for dike in function.dikelist
-        ])
-        cost_variables.extend([f"RfR Total Costs"])
-        cost_variables.extend([f"Expected Evacuation Costs"])
-        outcomes = []
+        # direction = ScalarOutcome.MINIMIZE
 
+        outcomes = []
+        for n in function.planning_steps:
+            cost_variables = []
+            cost_variables.extend(
+                [
+                    f"{dike}_{e}_{n}"
+                    for e in ["Expected Annual Damage", "Dike Investment Costs"]
+                    for dike in function.dikelist
+                ])
+            cost_variables.extend([f"RfR Total Costs_{n}"])
+            cost_variables.extend([f"Expected Evacuation Costs_{n}"])
+            outcomes.append(
+                ArrayOutcome(
+                    f" Total_Costs_{n}",
+                    variable_name=[var for var in cost_variables],
+                    function=sum_over,
+                ))
         for dike in function.dikelist:
             for entry in [
                 "Expected Annual Damage",
                 "Expected Number of Deaths",
             ]:
-                o = ArrayOutcome(f"{dike}_{entry}") #function = sum_over_time, kind = direction)
+                o = ArrayOutcome(f"{dike}_{entry}")  # function = sum_over_time, kind = direction)
                 outcomes.append(o)
+            # and change scalar into arrayoutcome
 
-
-            outcomes.append(
-                ScalarOutcome(
-                    f"All Costs",
-                    variable_name=[var for var in cost_variables],
-                    function=sum_over
-                ))
-            dike_model.outcomes = outcomes
-
+        outcomes.append(
+            ScalarOutcome(
+                "All Costs",
+                variable_name=["Total_Costs_0", "Total_Costs_1", "Total_Costs_2",
+                               "Total_Costs_3", "Total_Costs_4"],
+                function=sum_over,
+            ))
+        dike_model.outcomes = outcomes
 
     else:
         raise TypeError("unknown identifier")
 
     return dike_model, function.planning_steps
-
 
 if __name__ == "__main__":
     get_model_for_problem_formulation(3)
