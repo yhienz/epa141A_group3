@@ -12,7 +12,7 @@ from problem_formulation import get_model_for_problem_formulation
 if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
-    dike_model, planning_steps = get_model_for_problem_formulation(6)
+    dike_model, planning_steps = get_model_for_problem_formulation(7)
 
     # Build a user-defined scenario and policy:
     reference_values = {
@@ -102,15 +102,15 @@ if __name__ == "__main__":
     # experiments, outcomes = results
 
 
-    # from ema_workbench import MultiprocessingEvaluator, ema_logging
-    # ema_logging.log_to_stderr(ema_logging.INFO)
-    #
-    # with MultiprocessingEvaluator(dike_model) as evaluator:
-    #      results = evaluator.perform_experiments(scenarios= 1000, policies=20)
+    from ema_workbench import MultiprocessingEvaluator, ema_logging
+    ema_logging.log_to_stderr(ema_logging.INFO)
+
+    with MultiprocessingEvaluator(dike_model) as evaluator:
+         results = evaluator.perform_experiments(scenarios= 1, policies=1)
 
     #experiments_sobol, outcomes_sobol = results_sobol
 
-    save_results(results, 'Experiments/W24_validate5T_5t.gz')
+    save_results(results, 'Experiments/try_DisagT_PD7_1_1.tar.gz')
     #save_results(results, 'Experiments/W24_Open_Exploration_5t_10_3_PD6.tar.gz')
     #save_results(results_sobol, 'Experiments/Week22_Open_exploration_Sobol_1000_noP.tar.gz')
 
