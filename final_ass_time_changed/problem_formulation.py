@@ -43,6 +43,17 @@ def stick_over_time(*args):
 def slick_over_time(*args):
     return sum(arg[1] for arg in args)
 
+def sick_over_time(*args):
+    return sum(arg[2] for arg in args)
+
+def lick_over_time(*args):
+    return sum(arg[3] for arg in args)
+
+# def stick_over_time(*args):
+#     return sum(arg[0] for arg in args)
+#
+# def slick_over_time(*args):
+#     return sum(arg[1] for arg in args)
 
 
 
