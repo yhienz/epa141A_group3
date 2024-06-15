@@ -32,10 +32,10 @@ def sum_over_time(*args):
     summed = data.sum(axis = 0)
     return summed
 
-def annual_to_period(*args):
-    data = np.asarray(args)
-    period_v = data * 33
-    return period_v
+# def annual_to_period(*args):
+#     data = np.asarray(args)
+#     period_v = data * 33
+#     return period_v
 
 def pick_over_time(*args):
     for entry in args:
@@ -54,6 +54,9 @@ def sick_over_time(*args):
 
 def lick_over_time(*args):
     return sum(arg[3] for arg in args)
+
+def kick_over_time(*args):
+    return sum(arg[4] for arg in args)
 
 # def stick_over_time(*args):
 #     return sum(arg[0] for arg in args)
@@ -481,7 +484,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
             [f"{dike}_Dike Investment Costs" for dike in function.dikelist]
             + [f"RfR Total Costs"]
             + [f"Expected Evacuation Costs"]
-            + [f"{dike}_Expected Annual Damage" for dike in function.dikelist]
+            #+ [f"{dike}_Expected Annual Damage" for dike in function.dikelist]
         )
 
         #EVEN KIJKEN OF WE NOG IETS WILLEN DOEN VAN ANNUAL NAAR PERIOD MAAR DAT IS NOG BEST LASTIG
