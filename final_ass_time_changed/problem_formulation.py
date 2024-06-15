@@ -31,6 +31,12 @@ def sum_over_time(*args):
     data = np.asarray(args)
     summed = data.sum(axis = 0)
     return summed
+
+def annual_to_period(*args):
+    data = np.asarray(args)
+    period_v = data * 33
+    return period_v
+
 def pick_over_time(*args):
     for entry in args:
         a = entry[_]
@@ -430,6 +436,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 function=sum_over,
             ))
         dike_model.outcomes = outcomes
+
         # new PF
     elif problem_formulation_id == 7:
         outcomes = []
@@ -445,9 +452,17 @@ def get_model_for_problem_formulation(problem_formulation_id):
             )
         )
 
-        # All costs disaggregated over time (for adaptive strategy), but aggregated over location
+        #damages disaggreaged over time and location
+        for dike in function.dikelist:
+            for entry in [
+                "Expected Annual Damage",
+            ]:
 
-        ##if you also want to see the different kind of costs, then uncomment this section
+                o = ArrayOutcome(f"{dike}_{entry}")
+                outcomes.append(o)
+
+        # All costs disaggregated over time (for adaptive strategy), but aggregated over location
+        #if you also want to see the different kind of costs, then uncomment this section
         # outcomes.append(
         #     ArrayOutcome(
         #         f"Dike Investment Costs",
@@ -466,17 +481,16 @@ def get_model_for_problem_formulation(problem_formulation_id):
             [f"{dike}_Dike Investment Costs" for dike in function.dikelist]
             + [f"RfR Total Costs"]
             + [f"Expected Evacuation Costs"]
+            + [f"{dike}_Expected Annual Damage" for dike in function.dikelist]
         )
-        # damages disaggregated over both time and location
-        for dike in function.dikelist:
-            for entry in [
-                "Expected Annual Damage"
-            ]:
-                o = ArrayOutcome(f"{dike}_{entry}_Expected Damage")
-                outcomes.append(o)
-                #### Dit is de TOEVOEGINGS van EXPECTED DAMAGE,
-                # als je dit verander moet je bij de functies ook een extra waarde erbij doen
-                #cost_variables.extend(o)
+
+        #EVEN KIJKEN OF WE NOG IETS WILLEN DOEN VAN ANNUAL NAAR PERIOD MAAR DAT IS NOG BEST LASTIG
+        # cost_variables.extend(
+        #     ArrayOutcome(
+        #         variable_name=[f"{dike}_Expected Annual Damage" for dike in function.dikelist],
+        #         function=annual_to_period
+        #     )
+        # )
 
         outcomes.append(
             ArrayOutcome(
