@@ -17,7 +17,10 @@ import seaborn as sns
 if __name__ == "__main__":
     ema_logging.log_to_stderr(ema_logging.INFO)
 
-    model, steps = get_model_for_problem_formulation(6)
+    model, steps = get_model_for_problem_formulation(7)
+    # Replicate the objectives
+    for outcome in model.outcomes:
+        print(repr(outcome))
 
     reference_values = {
         "Bmax": 175,
@@ -26,6 +29,8 @@ if __name__ == "__main__":
         "discount rate 0": 3.5,
         "discount rate 1": 3.5,
         "discount rate 2": 3.5,
+        "discount rate 3": 3.5,
+        "discount rate 4": 3.5,
         "ID flood wave shape": 4,
     }
     scen1 = {}

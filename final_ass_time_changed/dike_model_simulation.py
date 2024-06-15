@@ -26,6 +26,10 @@ if __name__ == "__main__":
     reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
     scen1 = {}
 
+    # Replicate the objectives
+    for outcome in dike_model.outcomes:
+        print(repr(outcome))
+
     for key in dike_model.uncertainties:
         name_split = key.name.split("_")
 
@@ -108,10 +112,8 @@ if __name__ == "__main__":
     with MultiprocessingEvaluator(dike_model) as evaluator:
          results = evaluator.perform_experiments(scenarios= 1, policies=1)
 
-    #experiments_sobol, outcomes_sobol = results_sobol
-
+    experiments, outcomes = results
     save_results(results, 'Experiments/try_DisagT_PD7_1_1.tar.gz')
     #save_results(results, 'Experiments/W24_Open_Exploration_5t_10_3_PD6.tar.gz')
-    #save_results(results_sobol, 'Experiments/Week22_Open_exploration_Sobol_1000_noP.tar.gz')
 
 

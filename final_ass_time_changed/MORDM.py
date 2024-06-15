@@ -142,10 +142,10 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(10):
-            (y, t) = evaluator.optimize(nfe=50000, searchover='levers',
+        for _ in range(5):
+            (y, t) = evaluator.optimize(nfe=25000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
                                         constraints=constraint)
 
             results_epsilon = pd.concat([results_epsilon, t])
@@ -194,10 +194,10 @@ if __name__ == '__main__':
     results_epsilon2 = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes2 = pd.DataFrame()
     with MultiprocessingEvaluator(model2) as evaluator:
-        for _ in range(10):
-            (y, t) = evaluator.optimize(nfe=50000, searchover='levers',
+        for _ in range(5):
+            (y, t) = evaluator.optimize(nfe=25000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.01] * len(model2.outcomes), reference=ref_scenario,
+                                        epsilons=[0.1] * len(model2.outcomes), reference=ref_scenario,
                                         constraints=constraint)
 
             results_epsilon2 = pd.concat([results_epsilon2, t])

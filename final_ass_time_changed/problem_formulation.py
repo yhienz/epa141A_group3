@@ -8,6 +8,7 @@ from ema_workbench import (
     CategoricalParameter,
     ArrayOutcome,
     ScalarOutcome,
+    TimeSeriesOutcome,
     IntegerParameter,
     RealParameter,
 )
@@ -24,18 +25,25 @@ def sum_over(*args):
         except TypeError:
             value = entry
         numbers.append(value)
-
     return sum(numbers)
 
 def sum_over_time(*args):
     data = np.asarray(args)
     summed = data.sum(axis = 0)
     return summed
+def pick_over_time(*args):
+    for entry in args:
+        a = entry[_]
+        pass
+    return a
 
-# def sum_over_adapt(*args):
-#     data= np.asarray(args)
-#     summed= data.sum(axis= 0)
-#     return summed
+def stick_over_time(*args):
+    return sum(arg[0] for arg in args)
+
+def slick_over_time(*args):
+    return sum(arg[1] for arg in args)
+
+
 
 
 def get_model_for_problem_formulation(problem_formulation_id):
@@ -373,80 +381,21 @@ def get_model_for_problem_formulation(problem_formulation_id):
         outcomes.append(ArrayOutcome("Expected Evacuation Costs"))
         dike_model.outcomes = outcomes
 
-    #new PF
-    elif problem_formulation_id == 7:
-        outcomes = []
-
-        #damages disaggregated over both time and location
-        for dike in function.dikelist:
-                for entry in [
-                    "Expected Annual Damage",
-                ]:
-                    o = ArrayOutcome(f"{dike}_{entry}")
-                    outcomes.append(o)
-
-        #Deaths disaggregated over time but aggreaged over location
-        outcomes.append(
-            ArrayOutcome(
-                f"Expected Number of Deaths",
-                variable_name=[
-                    f"{dike}_Expected Number of Deaths" for dike in function.dikelist
-                ],
-                function=sum_over_time,
-            )
-        )
-
-        #All costs disaggregated over time (for adaptive strategy), but aggregated over location
-
-        ##if you also want to see the different kind of costs, then uncomment this section
-        # outcomes.append(
-        #     ArrayOutcome(
-        #         f"Dike Investment Costs",
-        #         variable_name=[
-        #             f"{dike}_Dike Investment Costs" for dike in function.dikelist
-        #         ],
-        #         function=sum_over_time,
-        #     )
-        # )
-        # outcomes.append(ArrayOutcome("RfR Total Costs"))
-        # outcomes.append(ArrayOutcome("Expected Evacuation Costs"))
-
-
-        #creating one array with Total cost but diaggregated over time.
-        cost_variables = []
-        cost_variables.extend(
-            [f"{dike}_Dike Investment Costs" for dike in function.dikelist]
-            + [f"RfR Total Costs"]
-            + [f"Expected Evacuation Costs"]
-        )
-        outcomes.append(
-            ArrayOutcome(
-                "Total_period_Costs",
-                variable_name=[var for var in cost_variables],
-                function=sum_over_time,
-            ),
-        )
-
-        dike_model.outcomes = outcomes
-
-
-
-
     # New PF
     elif problem_formulation_id == 6:
-        # direction = ScalarOutcome.MINIMIZE
+        direction = ScalarOutcome.MINIMIZE
 
         outcomes = []
         for n in function.planning_steps:
             cost_variables = []
             cost_variables.extend(
                 [
-                    f"{dike}_{e}_{n}"
+                    f"{dike}_{e} {n}"
                     for e in ["Expected Annual Damage", "Dike Investment Costs"]
                     for dike in function.dikelist
                 ])
-            cost_variables.extend([f"RfR Total Costs_{n}"])
-            cost_variables.extend([f"Expected Evacuation Costs_{n}"])
+            cost_variables.extend([f"RfR Total Costs {n}"])
+            cost_variables.extend([f"Expected Evacuation Costs {n}"])
             outcomes.append(
                 ArrayOutcome(
                     f" Total_Costs_{n}",
@@ -470,7 +419,63 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 function=sum_over,
             ))
         dike_model.outcomes = outcomes
+        # new PF
+    elif problem_formulation_id == 7:
+        outcomes = []
 
+        # Deaths disaggregated over time but aggregated over location
+        outcomes.append(
+            ArrayOutcome(
+                f"Expected Number of Deaths",
+                variable_name=[
+                    f"{dike}_Expected Number of Deaths" for dike in function.dikelist
+                ],
+                function=sum_over_time,
+            )
+        )
+
+        # All costs disaggregated over time (for adaptive strategy), but aggregated over location
+
+        ##if you also want to see the different kind of costs, then uncomment this section
+        # outcomes.append(
+        #     ArrayOutcome(
+        #         f"Dike Investment Costs",
+        #         variable_name=[
+        #             f"{dike}_Dike Investment Costs" for dike in function.dikelist
+        #         ],
+        #         function=sum_over_time,
+        #     )
+        # )
+        # outcomes.append(ArrayOutcome("RfR Total Costs"))
+        # outcomes.append(ArrayOutcome("Expected Evacuation Costs"))
+
+        # creating one array with Total cost but disaggregated over time.
+        cost_variables = []
+        cost_variables.extend(
+            [f"{dike}_Dike Investment Costs" for dike in function.dikelist]
+            + [f"RfR Total Costs"]
+            + [f"Expected Evacuation Costs"]
+        )
+        # damages disaggregated over both time and location
+        for dike in function.dikelist:
+            for entry in [
+                "Expected Annual Damage"
+            ]:
+                o = ArrayOutcome(f"{dike}_{entry}")
+                outcomes.append(o)
+
+        outcomes.append(
+            ArrayOutcome(
+                "Total_period_Costs",
+                variable_name=[var for var in cost_variables],
+                function=sum_over_time
+            )
+        )
+        dike_model.outcomes = outcomes
+    elif problem_formulation_id == 8:
+        cost_variables = []
+        cost_variables.extend(ScalarOutcome(f"{dike}_Dike Investment Costs",function=sum_over_time) for dike in function.dikelist)
+        dike_model.outcomes = cost_variables
     else:
         raise TypeError("unknown identifier")
 
