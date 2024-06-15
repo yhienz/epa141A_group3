@@ -461,8 +461,11 @@ def get_model_for_problem_formulation(problem_formulation_id):
             for entry in [
                 "Expected Annual Damage"
             ]:
-                o = ArrayOutcome(f"{dike}_{entry}")
+                o = ArrayOutcome(f"{dike}_{entry}_Expected Damage")
                 outcomes.append(o)
+                #### Dit is de TOEVOEGINGS van EXPECTED DAMAGE,
+                # als je dit verander moet je bij de functies ook een extra waarde erbij doen
+                #cost_variables.extend(o)
 
         outcomes.append(
             ArrayOutcome(
@@ -472,6 +475,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
             )
         )
         dike_model.outcomes = outcomes
+
     elif problem_formulation_id == 8:
         cost_variables = []
         cost_variables.extend(ScalarOutcome(f"{dike}_Dike Investment Costs",function=sum_over_time) for dike in function.dikelist)
