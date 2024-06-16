@@ -28,5 +28,5 @@ python -m pip install networkx
 python -m pip install openpyxl
 python -m pip install xlrd
 
-python MORDM.py
-mpiexec -n 1 python3 MORDM.py
+python MORDM2.py
+mpiexec -n 1 python3 MORDM2.py

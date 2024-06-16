@@ -484,7 +484,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
             [f"{dike}_Dike Investment Costs" for dike in function.dikelist]
             + [f"RfR Total Costs"]
             + [f"Expected Evacuation Costs"]
-            #+ [f"{dike}_Expected Annual Damage" for dike in function.dikelist]
+            + [f"{dike}_Expected Annual Damage" for dike in function.dikelist]
         )
 
         #EVEN KIJKEN OF WE NOG IETS WILLEN DOEN VAN ANNUAL NAAR PERIOD MAAR DAT IS NOG BEST LASTIG
