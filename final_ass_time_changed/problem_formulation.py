@@ -43,28 +43,24 @@ def pick_over_time(*args):
         pass
     return a
 
-def stick_over_time(*args):
+def time_step_0(*args):
     return sum(arg[0] for arg in args)
 
-def slick_over_time(*args):
+def time_step_1(*args):
     return sum(arg[1] for arg in args)
 
-def sick_over_time(*args):
+def time_step_2(*args):
     return sum(arg[2] for arg in args)
 
-def lick_over_time(*args):
+def time_step_3(*args):
     return sum(arg[3] for arg in args)
 
-def kick_over_time(*args):
+def time_step_4(*args):
     return sum(arg[4] for arg in args)
-
-# def stick_over_time(*args):
-#     return sum(arg[0] for arg in args)
 #
-# def slick_over_time(*args):
-#     return sum(arg[1] for arg in args)
-
-
+# def stick_over_time(*args):
+#     g, h, i, j, k, l, m = args
+#     costie = g[0] + h[0] + i[0] + j[0] + k[0] + l[0] + m[0]
 
 def get_model_for_problem_formulation(problem_formulation_id):
     """Convenience function to prepare DikeNetwork in a way it can be input in the EMA-workbench.
@@ -454,7 +450,6 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 function=sum_over_time,
             )
         )
-
         #damages disaggreaged over time and location
         for dike in function.dikelist:
             for entry in [
@@ -465,7 +460,7 @@ def get_model_for_problem_formulation(problem_formulation_id):
                 outcomes.append(o)
 
         # All costs disaggregated over time (for adaptive strategy), but aggregated over location
-        #if you also want to see the different kind of costs, then uncomment this section
+        # if you also want to see the different kind of costs, then uncomment this section
         # outcomes.append(
         #     ArrayOutcome(
         #         f"Dike Investment Costs",
