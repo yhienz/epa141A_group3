@@ -113,7 +113,7 @@ if __name__ == "__main__":
          results = evaluator.perform_experiments(scenarios= 1, policies=1)
 
     experiments, outcomes = results
-    save_results(results, 'Experiments/try_DisagT_PD7_1_1.tar.gz')
+    save_results(results, 'Experiments/Archive/try_DisagT_PD7_1_1.tar.gz')
     #save_results(results, 'Experiments/W24_Open_Exploration_5t_10_3_PD6.tar.gz')
 
 

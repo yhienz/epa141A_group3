@@ -12,7 +12,8 @@ from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
 from ema_workbench import save_results, load_results
-from ema_workbench.em_framework.optimization import (EpsilonProgress)
+from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
+from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
 
 def initialize_model():
     ema_logging.log_to_stderr(ema_logging.INFO)
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     ref_scenario = Scenario('reference', **refcase_scen)
 
     ######### Overijssel
-    model = problem_formulation_actor(7, uncertainties, levers)
+    model = problem_formulation_actor(6, uncertainties, levers)
 
     # Deepcopying the uncertainties and levers
     uncertainties = copy.deepcopy(dike_model.uncertainties)
@@ -143,69 +144,57 @@ if __name__ == '__main__':
 
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
+    results=[]
     with MultiprocessingEvaluator(model) as evaluator:
         for _ in range(3):
-            (y, t) = evaluator.optimize(nfe=25000, searchover='levers',
-                                        convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario)
+            #
+            # convergence_metrics = [
+            #     ArchiveLogger(
+            #         "./archives",
+            #         [l.name for l in model.levers],
+            #         [o.name for o in model.outcomes],
+            #         base_filename=f"{_}.tar.gz",
+            #     ),
+            #     EpsilonProgress(),
+            # ]
 
+
+            result = evaluator.optimize(nfe=25000, searchover='levers',
+                                        convergence=convergence_metrics,
+                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario)
+            y,t = result
+            results.append(result)
             results_epsilon = pd.concat([results_epsilon, t])
             results_outcomes = pd.concat([results_outcomes, y])
 
+    # all_archives = []
+    #
+    # for i in range(2):
+    #     archives = ArchiveLogger.load_archives(f"./archives/{i}.tar.gz")
+    #     all_archives.append(archives)
 
-
-    # Save the concatenated DataFrame to a CSV file
-    results_epsilon.to_csv('Week24_MORDM_epsilon_overijssel_PD7_.csv', index=False)
-    results_outcomes.to_csv('Week24_MORDM_outcomes_overijssel_PD7_.csv', index=False)
-
-
-# ######### Gelderland
-if __name__ == '__main__':
-    dike_model, planning_steps = initialize_model()
-
-    uncertainties = dike_model.uncertainties
-    levers = dike_model.levers
-
-    # Setting the reference scenario
-    reference_values = {
-        "Bmax": 175,
-        "Brate": 1.5,
-        "pfail": 0.5,
-        "ID flood wave shape": 4,
-        "planning steps": 2,
-    }
-    reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
-    refcase_scen = {}
-
-    for key in dike_model.uncertainties:
-        name_split = key.name.split('_')
-        if len(name_split) == 1:
-            refcase_scen.update({key.name: reference_values[key.name]})
-        else:
-            refcase_scen.update({key.name: reference_values[name_split[1]]})
-
-    ref_scenario = Scenario('reference', **refcase_scen)
-
-    ######### Overijssel
-    model2 = problem_formulation_actor(6, uncertainties, levers)
-
-    #constraint = [Constraint("Total period Costs",
-    #                         outcome_names=[f"{dike}_Expected Number of Deaths" for dike in function.dikelist],
-    #                        function=lambda x: max(0, x - 100000000))]
-
-    results_epsilon2 = pd.DataFrame()  # Initialize an empty DataFrame
-    results_outcomes2 = pd.DataFrame()
-    with MultiprocessingEvaluator(model2) as evaluator:
-        for _ in range(3):
-            (y, t) = evaluator.optimize(nfe=25000, searchover='levers',
-                                        convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model2.outcomes), reference=ref_scenario)
-
-            results_epsilon2 = pd.concat([results_epsilon2, t])
-            results_outcomes2 = pd.concat([results_outcomes2, y])
-
+    # print(reference_set.shape)
+    # print(type(reference_set))
+    # print(reference_set.head())
 
     # Save the concatenated DataFrame to a CSV file
-    results_epsilon2.to_csv('Week23_MORDM_Gelderland_PD7_.csv', index=False)
-    results_outcomes2.to_csv('Week23_MORDM_Gelderland_PD7_.csv', index=False)
+    results_epsilon.to_csv('Week25_MORDM_epsilon_Gelderland_PD7_.csv', index=False)
+    results_outcomes.to_csv('Week25_MORDM_outcomes_Gelderland_PD7_.csv', index=False)
 
+    ### Gelderland Exploration
+
+    policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policies = policy_set.iloc[:,1:51]
+
+    from ema_workbench import Policy
+
+    rcase_policies = []
+
+    for i, policy in policies.iterrows():
+        rcase_policies.append(Policy(str(i), **policy.to_dict()))
+
+    n_scenarios = 2000
+    with MultiprocessingEvaluator(model) as evaluator:
+        reference_policies_results = evaluator.perform_experiments(n_scenarios,
+                                                rcase_policies)
+    save_results(reference_policies_results, 'Week25_Gelderland.tar.gz')
