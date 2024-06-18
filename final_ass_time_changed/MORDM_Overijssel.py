@@ -11,7 +11,7 @@ from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
 from ema_workbench import Policy
-from ema_workbench import save_results, load_results
+from ema_workbench import save_results,  load_results
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
 
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
             result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.05] * len(model.outcomes), reference=ref_scenario,
                                         constraints = constraint)
 
     results_outcomes, results_epsilon = result
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     problem = to_problem(model, searchover="levers")
 
 
-    epsilons = [0.1] * len(model.outcomes)
+    epsilons = [0.05] * len(model.outcomes)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file

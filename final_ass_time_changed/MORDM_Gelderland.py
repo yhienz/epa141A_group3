@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
             result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.05] * len(model.outcomes), reference=ref_scenario,
                                         constraints=constraint)
             y,t = result
             results.append(y)
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     problem = to_problem(model, searchover="levers")
 
     ##!! deze epsilons waarden moeten hetzelfde zijn als boven
-    epsilons = [0.1] * len(model.outcomes)
+    epsilons = [0.05] * len(model.outcomes)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
 

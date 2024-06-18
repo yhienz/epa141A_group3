@@ -175,7 +175,7 @@ if __name__ == '__main__':
     #BAD1
     s2_values = {"Bmax": 200,
         "Brate": 2,
-        "pfail": 0.75,
+        "pfail": 0.9,
         "ID flood wave shape": 123,
         "planning steps": 5,
         "discount rate 0": 2.5,
@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
                 (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
-                                                         epsilons= [0.1] *len(model.outcomes),
+                                                         epsilons= [0.05] *len(model.outcomes),
                                                          reference=scenario, constraints=constraint2)
 
                 results.append(result)
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     for scenario in scenarios:
-        epsilons = [0.1, ] * len(model.outcomes)
+        epsilons = [0.05, ] * len(model.outcomes)
 
         # note that 100000 nfe is again rather low to ensure proper convergence
         resul = optimize(scenario, 50000, model, epsilons, constraint)
