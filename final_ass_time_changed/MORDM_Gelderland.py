@@ -186,7 +186,7 @@ if __name__ == '__main__':
     for i, policy in policies.iterrows():
         rcase_policies.append(Policy(str(i), **policy.to_dict()))
 
-    n_scenarios = 2000
+    n_scenarios = 10
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
