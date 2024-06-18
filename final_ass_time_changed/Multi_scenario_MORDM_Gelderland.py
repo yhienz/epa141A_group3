@@ -262,4 +262,4 @@ if __name__ == '__main__':
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    save_results(reference_policies_results, 'Gelderland_Multi_MORDM_outcomes_explr.gz')
+    save_results(reference_policies_results, 'Gelderland_Multi_MORDM_outcomes_explr.tar.gz')
