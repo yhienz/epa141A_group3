@@ -53,9 +53,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            #ScalarOutcome(f'Total_period_Costs_2',
+            #              variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #              function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -82,9 +82,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            #ScalarOutcome(f'Total_period_Costs_2',
+            #              variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #              function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -146,13 +146,16 @@ if __name__ == '__main__':
     results_outcomes = pd.DataFrame()
     results=[]
     convergences =[]
+    constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 1000000000))]
+
     with MultiprocessingEvaluator(model) as evaluator:
         for _ in range(1):
 
 
             result = evaluator.optimize(nfe=1, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario)
+                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario,
+                                        constraints=constraint)
             y,t = result
             results.append(y)
             results_epsilon = pd.concat([results_epsilon, t])

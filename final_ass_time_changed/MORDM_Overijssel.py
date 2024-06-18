@@ -11,6 +11,7 @@ from problem_formulation import (sum_over, time_step_0,time_step_1,
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
+from ema_workbench import Policy
 from ema_workbench import save_results, load_results
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
@@ -53,9 +54,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            #ScalarOutcome(f'Total_period_Costs_2',
+            #              variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #              function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -140,20 +141,21 @@ if __name__ == '__main__':
     # Running the optimization for Overijssel
     function = DikeNetwork()
     convergence_metrics = {EpsilonProgress()}
-    #constraint = [Constraint("Total period Costs", outcome_names= [f"{dike}_Expected Number of Deaths" for dike in function.dikelist], function=lambda x: max(0, x - 100000000))]
 
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
-    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 7000000000))]
+    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 1000000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(1):
+        for _ in range(3):
 
-            result = evaluator.optimize(nfe=2, searchover='levers',
+            result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
                                         constraints = constraint)
+
+    results_outcomes, results_epsilon = result
 
     # Save the concatenated DataFrame to a CSV file
     results_epsilon.to_csv('Week25_MORDM_epsilon_overijssel_PD7_.csv', index=False)
@@ -163,8 +165,6 @@ if __name__ == '__main__':
 
     policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
     policies = policy_set.iloc[:,1:51]
-
-    from ema_workbench import Policy
 
     rcase_policies = []
 
