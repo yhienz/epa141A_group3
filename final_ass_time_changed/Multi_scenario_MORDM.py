@@ -128,7 +128,22 @@ if __name__ == '__main__':
         else:
             refcase_scen.update({key.name: reference_values[name_split[1]]})
 
+
+    def create_scen(values, id):
+        scen = {}
+        for key in dike_model.uncertainties:
+            name_split = key.name.split('_')
+            if len(name_split) == 1:
+                scen.update({key.name: values[key.name]})
+            else:
+                scen.update({key.name: values[name_split[1]]})
+        return Scenario(f"scen_{id}", **scen)
+
     ref_scenario = Scenario('reference', **refcase_scen)
+    print(ref_scenario)
+    values = reference_values
+    ref_scenario_test = create_scen(values, 'test')
+    print(ref_scenario_test)
 
 
     ######### Overijssel
@@ -143,44 +158,50 @@ if __name__ == '__main__':
     convergence_metrics = {EpsilonProgress()}
 
     ###### HERE entering the scenario selection
-    scenarios = [{ "Bmax": 175,
+    s1_values = { "Bmax": 175,
         "Brate": 1.5,
         "pfail": 0.1,
         "ID flood wave shape": 4,
         "planning steps": 5,
-        "discount rate 1": 3.5,
-        "discount rate 2": 3.5,
-        "discount rate 3": 3.5,
-    },
-        {"Bmax": 175,
-        "Brate": 1.5,
-        "pfail": 0.5,
-        "ID flood wave shape": 4,
-        "planning steps": 5,
-        "discount rate 1": 3.5,
+        "discount rate 0": 3.5,
+        "discount rate 1": 4.5,
         "discount rate 2": 4.5,
         "discount rate 3": 4.5,
-    },
-        {"Bmax": 175,
-         "Brate": 1.5,
-         "pfail": 0.5,
-         "ID flood wave shape": 2,
-         "planning steps": 5,
-         "discount rate 1": 3.5,
-         "discount rate 2": 3.5,
-         "discount rate 3": 3.5,
-         }
-        ,
-        {"Bmax": 100,
+        "discount rate 4": 4.5}
+
+    s2_values = {"Bmax": 175,
         "Brate": 1.5,
         "pfail": 0.5,
         "ID flood wave shape": 4,
         "planning steps": 5,
-        "discount rate 1": 3.5,
-        "discount rate 2": 3.5,
-        "discount rate 3": 3.5,
-        }
-               ]
+        "discount rate 0": 3.5,
+        "discount rate 1": 4.5,
+        "discount rate 2": 4.5,
+        "discount rate 3": 4.5,
+        "discount rate 4": 4.5}
+
+    scenarios = [ create_scen(s1_values, 's1'), create_scen(s2_values, 's2')]
+
+    #     {"Bmax": 175,
+    #      "Brate": 1.5,
+    #      "pfail": 0.5,
+    #      "ID flood wave shape": 2,
+    #      "planning steps": 5,
+    #      "discount rate 1": 3.5,
+    #      "discount rate 2": 3.5,
+    #      "discount rate 3": 3.5,
+    #      }
+    #     ,
+    #     {"Bmax": 100,
+    #     "Brate": 1.5,
+    #     "pfail": 0.5,
+    #     "ID flood wave shape": 4,
+    #     "planning steps": 5,
+    #     "discount rate 1": 3.5,
+    #     "discount rate 2": 3.5,
+    #     "discount rate 3": 3.5,
+    #     }
+
     #constraint = [Constraint("Total period Costs", outcome_names= [f"{dike}_Expected Number of Deaths" for dike in function.dikelist], function=lambda x: max(0, x - 100000000))]
 
     def optimize(scenario, nfe, model, epsilons):
@@ -190,20 +211,21 @@ if __name__ == '__main__':
 
         with MultiprocessingEvaluator(model) as evaluator:
             for i in range(1):
-                convergence_metrics = [
-                    ArchiveLogger(
-                        "./archives",
-                        [l.name for l in model.levers],
-                        [o.name for o in model.outcomes],
-                        base_filename=f"Mutli_MORDM_{scenario.name}_seed_{i}.tar.gz",
-                    ),
-                    EpsilonProgress(),
-                ]
+                # convergence_metrics = [
+                #     ArchiveLogger(
+                #         "./archives",
+                #         [l.name for l in model.levers],
+                #         [o.name for o in model.outcomes],
+                #         base_filename=f"Mutli_MORDM_{scenario.name}_seed_{i}.tar.gz",
+                #     ),
+                #     EpsilonProgress(),
+                # ]
+                convergence_metrics = {EpsilonProgress()}
 
-                (result, convergence) = evaluator.optimize(nfe=3, searchover='levers',
+                (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
                                                          epsilons= [1] *len(model.outcomes),
-                                                         reference=ref_scenario)
+                                                         reference=scenario)
 
                 results.append(result)
                 convergences.append(convergence)
@@ -220,5 +242,5 @@ if __name__ == '__main__':
         epsilons = [0.05, ] * len(model.outcomes)
 
         # note that 100000 nfe is again rather low to ensure proper convergence
-        results.append(optimize(scenario, 5, model, epsilons))
+        results.append(optimize(scenario, 1, model, epsilons))
     print(results)
