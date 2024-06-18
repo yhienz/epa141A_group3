@@ -147,11 +147,11 @@ if __name__ == '__main__':
     constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(1):
+        for _ in range(3):
 
-            result = evaluator.optimize(nfe=2, searchover='levers',
+            result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.1] * len(model.outcomes), reference=ref_scenario,
                                         constraints = constraint)
 
     results_outcomes, results_epsilon = result
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     problem = to_problem(model, searchover="levers")
 
 
-    epsilons = [0.01] * len(model.outcomes)
+    epsilons = [0.1] * len(model.outcomes)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file
