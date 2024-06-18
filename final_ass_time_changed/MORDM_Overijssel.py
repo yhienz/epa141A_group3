@@ -82,9 +82,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            #ScalarOutcome(f'Total_period_Costs_2',
+            #              variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #              function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -145,37 +145,15 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
-    with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(2):
-            #
-            # convergence_metrics = [
-            #     ArchiveLogger(
-            #         "./archives",
-            #         [l.name for l in model.levers],
-            #         [o.name for o in model.outcomes],
-            #         base_filename=f"{_}.tar.gz",
-            #     ),
-            #     EpsilonProgress(),
-            # ]
+    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 7000000000))]
 
+    with MultiprocessingEvaluator(model) as evaluator:
+        for _ in range(1):
 
             result = evaluator.optimize(nfe=2, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario)
-            y,t = result
-            results.append(result)
-            results_epsilon = pd.concat([results_epsilon, t])
-            results_outcomes = pd.concat([results_outcomes, y])
-
-    # all_archives = []
-    #
-    # for i in range(2):
-    #     archives = ArchiveLogger.load_archives(f"./archives/{i}.tar.gz")
-    #     all_archives.append(archives)
-
-    # print(reference_set.shape)
-    # print(type(reference_set))
-    # print(reference_set.head())
+                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario,
+                                        constraints = constraint)
 
     # Save the concatenated DataFrame to a CSV file
     results_epsilon.to_csv('Week25_MORDM_epsilon_overijssel_PD7_.csv', index=False)

@@ -145,37 +145,27 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
+    convergences =[]
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(3):
-            #
-            # convergence_metrics = [
-            #     ArchiveLogger(
-            #         "./archives",
-            #         [l.name for l in model.levers],
-            #         [o.name for o in model.outcomes],
-            #         base_filename=f"{_}.tar.gz",
-            #     ),
-            #     EpsilonProgress(),
-            # ]
+        for _ in range(1):
 
 
-            result = evaluator.optimize(nfe=25000, searchover='levers',
+            result = evaluator.optimize(nfe=1, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario)
+                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario)
             y,t = result
-            results.append(result)
+            results.append(y)
             results_epsilon = pd.concat([results_epsilon, t])
             results_outcomes = pd.concat([results_outcomes, y])
 
-    # all_archives = []
-    #
-    # for i in range(2):
-    #     archives = ArchiveLogger.load_archives(f"./archives/{i}.tar.gz")
-    #     all_archives.append(archives)
+            results.append(y)
+            convergences.append(t)
 
-    # print(reference_set.shape)
-    # print(type(reference_set))
-    # print(reference_set.head())
+    # merge the results using a non-dominated sort
+    problem = to_problem(model, searchover="levers")
+    epsilons = [1] * len(model.outcomes)
+    merged_archives = epsilon_nondominated(results, epsilons, problem)
+    print(merged_archives.shape)
 
     # Save the concatenated DataFrame to a CSV file
     results_epsilon.to_csv('Week25_MORDM_epsilon_Gelderland_PD7_.csv', index=False)

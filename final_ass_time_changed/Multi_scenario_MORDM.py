@@ -110,6 +110,26 @@ if __name__ == '__main__':
     uncertainties = dike_model.uncertainties
     levers = dike_model.levers
 
+    # Setting the reference scenario
+    reference_values = {
+        "Bmax": 175,
+        "Brate": 1.5,
+        "pfail": 0.5,
+        "ID flood wave shape": 4,
+        "planning steps": 2,
+    }
+    reference_values.update({f"discount rate {n}": 3.5 for n in planning_steps})
+    refcase_scen = {}
+
+    for key in dike_model.uncertainties:
+        name_split = key.name.split('_')
+        if len(name_split) == 1:
+            refcase_scen.update({key.name: reference_values[key.name]})
+        else:
+            refcase_scen.update({key.name: reference_values[name_split[1]]})
+
+    ref_scenario = Scenario('reference', **refcase_scen)
+
 
     ######### Overijssel
     model = problem_formulation_actor(7, uncertainties, levers)
@@ -132,7 +152,7 @@ if __name__ == '__main__':
         problem = to_problem(model, searchover="levers")
 
         with MultiprocessingEvaluator(model) as evaluator:
-            for i in range(5):
+            for i in range(1):
                 convergence_metrics = [
                     ArchiveLogger(
                         "./archives",
@@ -143,10 +163,10 @@ if __name__ == '__main__':
                     EpsilonProgress(),
                 ]
 
-                (result, convergence) = evaluator.optimize(nfe=nfe, searchover='levers',
+                (result, convergence) = evaluator.optimize(nfe=3, searchover='levers',
                                                          convergence=convergence_metrics,
-                                                         epsilons=epsilons,
-                                                         reference=scenario)
+                                                         epsilons= [1] *len(model.outcomes),
+                                                         reference=ref_scenario)
 
                 results.append(result)
                 convergences.append(convergence)
