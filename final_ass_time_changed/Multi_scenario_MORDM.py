@@ -11,7 +11,6 @@ from problem_formulation import (sum_over, time_step_0,time_step_1,
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
-from ema_workbench import save_results, load_results
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
 
@@ -53,9 +52,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            # ScalarOutcome(f'Total_period_Costs_2',
+            #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #               function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -82,9 +81,9 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
             ScalarOutcome(f'Total_period_Costs_1',
                           variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
                           function=time_step_1, kind=direction),
-            ScalarOutcome(f'Total_period_Costs_2',
-                          variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
-                          function=time_step_2, kind=direction),
+            # ScalarOutcome(f'Total_period_Costs_2',
+            #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
+            #               function=time_step_2, kind=direction),
             # ScalarOutcome(f'Total_period_Costs_3',
             #               variable_name=dike_model.outcomes['Total_period_Costs'].variable_name,
             #               function=time_step_3, kind=direction),
@@ -202,9 +201,10 @@ if __name__ == '__main__':
     #     "discount rate 3": 3.5,
     #     }
 
-    #constraint = [Constraint("Total period Costs", outcome_names= [f"{dike}_Expected Number of Deaths" for dike in function.dikelist], function=lambda x: max(0, x - 100000000))]
+    constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 500000000))]
 
-    def optimize(scenario, nfe, model, epsilons):
+
+    def optimize(scenario, nfe, model, epsilons, constraint2):
         results = []
         convergences = []
         problem = to_problem(model, searchover="levers")
@@ -220,12 +220,12 @@ if __name__ == '__main__':
                     ),
                     EpsilonProgress(),
                 ]
-                #convergence_metrics = {EpsilonProgress()}
+                convergence_metrics = {EpsilonProgress()}
 
                 (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
                                                          epsilons= [1] *len(model.outcomes),
-                                                         reference=scenario)
+                                                         reference=scenario, constraints=constraint2)
 
                 results.append(result)
                 convergences.append(convergence)
@@ -236,11 +236,17 @@ if __name__ == '__main__':
         return reference_set, convergences
 
 
-    results = []
-
+    results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
+    results_outcomes = pd.DataFrame()
     for scenario in scenarios:
         epsilons = [0.05, ] * len(model.outcomes)
 
         # note that 100000 nfe is again rather low to ensure proper convergence
-        results.append(optimize(scenario, 1, model, epsilons))
-    print(results)
+        resul = optimize(scenario, 1, model, epsilons, constraint)
+
+        y, t = resul
+        results_epsilon = pd.concat([results_epsilon, t])
+        results_outcomes = pd.concat([results_outcomes, y])
+
+    results_epsilon.to_csv('Overijssel_Multi_MORDM_epsilon.csv', index=False)
+    results_outcomes.to_csv("Overijssel_Multi_MORDM_outcomes.csv", index=False)

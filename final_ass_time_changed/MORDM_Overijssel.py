@@ -5,8 +5,7 @@ import copy
 # Import functions
 from dike_model_function import DikeNetwork  # @UnresolvedImport
 from problem_formulation import get_model_for_problem_formulation
-from problem_formulation import (sum_over, time_step_0,time_step_1,
-                                 time_step_2, time_step_3, time_step_4)
+from problem_formulation import (sum_over, time_step_0,time_step_1)
 # Loading in the necessary modules for EMA workbench and functions
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
@@ -145,26 +144,32 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
-    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 1000000000))]
+    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(3):
+        for _ in range(1):
 
-            result = evaluator.optimize(nfe=20000, searchover='levers',
+            result = evaluator.optimize(nfe=2, searchover='levers',
                                         convergence=convergence_metrics,
                                         epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
                                         constraints = constraint)
 
     results_outcomes, results_epsilon = result
+    # merge the results using a non-dominated sort
+    problem = to_problem(model, searchover="levers")
+
+
+    epsilons = [0.01] * len(model.outcomes)
+    merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file
     results_epsilon.to_csv('Week25_MORDM_epsilon_overijssel_PD7_.csv', index=False)
-    results_outcomes.to_csv('Week25_MORDM_outcomes_overijssel_PD7_.csv', index=False)
+    merged_archives.to_csv('Week25_MORDM_outcomes_overijssel_PD7_.csv', index=False)
 
     ### Gelderland Exploration
 
-    policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
-    policies = policy_set.iloc[:,1:51]
+    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policies = merged_archives.iloc[:,1:51]
 
     rcase_policies = []
 

@@ -11,6 +11,7 @@ from problem_formulation import (sum_over, time_step_0,time_step_1,
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
+from ema_workbench import Policy
 from ema_workbench import save_results, load_results
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
@@ -146,15 +147,14 @@ if __name__ == '__main__':
     results_outcomes = pd.DataFrame()
     results=[]
     convergences =[]
-    constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 1000000000))]
+    constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
         for _ in range(1):
 
-
-            result = evaluator.optimize(nfe=1, searchover='levers',
+            result = evaluator.optimize(nfe=2, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[0.01] * len(model.outcomes), reference=ref_scenario,
                                         constraints=constraint)
             y,t = result
             results.append(y)
@@ -166,21 +166,20 @@ if __name__ == '__main__':
 
     # merge the results using a non-dominated sort
     problem = to_problem(model, searchover="levers")
-    epsilons = [1] * len(model.outcomes)
+
+    ##!! deze epsilons waarden moeten hetzelfde zijn als boven
+    epsilons = [0.01] * len(model.outcomes)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
-    print(merged_archives.shape)
+
 
     # Save the concatenated DataFrame to a CSV file
-    results_epsilon.to_csv('Week25_MORDM_epsilon_Gelderland_PD7_.csv', index=False)
-    results_outcomes.to_csv('Week25_MORDM_outcomes_Gelderland_PD7_.csv', index=False)
+    results_epsilon.to_csv('Gelderland_MORDM_epsilon.csv', index=False)
+    merged_archives.to_csv('Gelderland_MORDM_outcomes.csv', index=False)
 
     ### Gelderland Exploration
 
-    policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
-    policies = policy_set.iloc[:,1:51]
-
-    from ema_workbench import Policy
-
+    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policies = merged_archives.iloc[:,1:51]
     rcase_policies = []
 
     for i, policy in policies.iterrows():
