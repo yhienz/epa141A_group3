@@ -10,6 +10,8 @@ from problem_formulation import (sum_over, time_step_0,time_step_1,
 # Loading in the necessary modules for EMA workbench and functions
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
+from ema_workbench import Policy
+from ema_workbench import save_results, load_results
 from ema_workbench.util import ema_logging
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
@@ -246,3 +248,18 @@ if __name__ == '__main__':
 
     results_epsilon.to_csv('Gelderland_Multi_MORDM_epsilon.csv', index=False)
     results_outcomes.to_csv("Gelderland_Multi_MORDM_outcomes.csv", index=False)
+
+    ### Gelderland Exploration
+    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policies = results_outcomes.iloc[:,1:51]
+
+    rcase_policies = []
+
+    for i, policy in policies.iterrows():
+        rcase_policies.append(Policy(str(i), **policy.to_dict()))
+
+    n_scenarios = 2000
+    with MultiprocessingEvaluator(model) as evaluator:
+        reference_policies_results = evaluator.perform_experiments(n_scenarios,
+                                                rcase_policies)
+    save_results(reference_policies_results, 'Gelderland_Multi_MORDM_outcomes_explr.gz')
