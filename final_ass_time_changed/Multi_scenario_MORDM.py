@@ -211,16 +211,16 @@ if __name__ == '__main__':
 
         with MultiprocessingEvaluator(model) as evaluator:
             for i in range(1):
-                # convergence_metrics = [
-                #     ArchiveLogger(
-                #         "./archives",
-                #         [l.name for l in model.levers],
-                #         [o.name for o in model.outcomes],
-                #         base_filename=f"Mutli_MORDM_{scenario.name}_seed_{i}.tar.gz",
-                #     ),
-                #     EpsilonProgress(),
-                # ]
-                convergence_metrics = {EpsilonProgress()}
+                convergence_metrics = [
+                    ArchiveLogger(
+                        "./archives",
+                        [l.name for l in model.levers],
+                        [o.name for o in model.outcomes],
+                        base_filename=f"Mutli_MORDM_{scenario.name}_seed_{i}.tar.gz",
+                    ),
+                    EpsilonProgress(),
+                ]
+                #convergence_metrics = {EpsilonProgress()}
 
                 (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
