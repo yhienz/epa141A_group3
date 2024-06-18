@@ -143,7 +143,44 @@ if __name__ == '__main__':
     convergence_metrics = {EpsilonProgress()}
 
     ###### HERE entering the scenario selection
-    scenarios = []
+    scenarios = [{ "Bmax": 175,
+        "Brate": 1.5,
+        "pfail": 0.1,
+        "ID flood wave shape": 4,
+        "planning steps": 5,
+        "discount rate 1": 3.5,
+        "discount rate 2": 3.5,
+        "discount rate 3": 3.5,
+    },
+        {"Bmax": 175,
+        "Brate": 1.5,
+        "pfail": 0.5,
+        "ID flood wave shape": 4,
+        "planning steps": 5,
+        "discount rate 1": 3.5,
+        "discount rate 2": 4.5,
+        "discount rate 3": 4.5,
+    },
+        {"Bmax": 175,
+         "Brate": 1.5,
+         "pfail": 0.5,
+         "ID flood wave shape": 2,
+         "planning steps": 5,
+         "discount rate 1": 3.5,
+         "discount rate 2": 3.5,
+         "discount rate 3": 3.5,
+         }
+        ,
+        {"Bmax": 100,
+        "Brate": 1.5,
+        "pfail": 0.5,
+        "ID flood wave shape": 4,
+        "planning steps": 5,
+        "discount rate 1": 3.5,
+        "discount rate 2": 3.5,
+        "discount rate 3": 3.5,
+        }
+               ]
     #constraint = [Constraint("Total period Costs", outcome_names= [f"{dike}_Expected Number of Deaths" for dike in function.dikelist], function=lambda x: max(0, x - 100000000))]
 
     def optimize(scenario, nfe, model, epsilons):
@@ -178,8 +215,10 @@ if __name__ == '__main__':
 
 
     results = []
+
     for scenario in scenarios:
         epsilons = [0.05, ] * len(model.outcomes)
 
         # note that 100000 nfe is again rather low to ensure proper convergence
-        results.append(optimize(scenario, 1e5, model, epsilons))
+        results.append(optimize(scenario, 5, model, epsilons))
+    print(results)
