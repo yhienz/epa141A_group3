@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-#SBATCH --job-name="Policy_MP_GRP3"
+#SBATCH --job-name="MORDM Gelderland"
 #SBATCH --account=education-tpm-msc-epa
 #SBATCH --mail-user=y.hiensch@student.tudelft.nl
 #SBATCH --mail-type=all
 
-#SBATCH --time=20:00:00
+#SBATCH --time=15:00:00
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
