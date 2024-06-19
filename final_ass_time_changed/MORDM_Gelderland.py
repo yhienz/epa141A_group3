@@ -164,13 +164,12 @@ if __name__ == '__main__':
 
     ##!! deze epsilons waarden moeten hetzelfde zijn als boven
     epsilons = [1,1,1,1,1,1,0.1]
-    print(results)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
 
     # Save the concatenated DataFrame to a CSV file
-    #results_epsilon.to_csv('Gelderland_MORDM_epsilon.csv', index=False)
-    #merged_archives.to_csv('Gelderland_MORDM_outcomes.csv', index=False)
+    results_epsilon.to_csv('Gelderland_MORDM_epsilon.csv', index=False)
+    merged_archives.to_csv('Gelderland_MORDM_outcomes.csv', index=False)
 
     ### Gelderland Exploration
 
@@ -181,8 +180,8 @@ if __name__ == '__main__':
     for i, policy in policies.iterrows():
         rcase_policies.append(Policy(str(i), **policy.to_dict()))
 
-    n_scenarios = 20000
+    n_scenarios = 1500
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    #save_results(reference_policies_results, 'Week25_Gelderland.tar.gz')
+    save_results(reference_policies_results, 'Week25_Gelderland.tar.gz')

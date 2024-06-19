@@ -151,26 +151,24 @@ if __name__ == '__main__':
 
             result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1,1,1,1,1,0.1] , reference=ref_scenario,
+                                        epsilons=[1,1,1,1,1,0.1], reference=ref_scenario,
                                         constraints = constraint)
 
             result_outcomes, result_epsilon = result
             results.append(result_outcomes)
 
             # epsilon values
-            results_epsilon = pd.concat([results_epsilon,result_epsilon ])
+            results_epsilon = pd.concat([results_epsilon, result_epsilon])
 
     # merge the results using a non-dominated sort
     problem = to_problem(model, searchover="levers")
 
-
     epsilons = [1,1,1,1,1,0.1]
-    print(results)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file
-    #results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
-    #merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
+    results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
+    merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
 
     ### Gelderland Exploration
 
@@ -182,8 +180,8 @@ if __name__ == '__main__':
     for i, policy in policies.iterrows():
         rcase_policies.append(Policy(str(i), **policy.to_dict()))
 
-    n_scenarios = 2000
+    n_scenarios = 1500
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    #save_results(reference_policies_results, 'Week25.tar.gz')
+    save_results(reference_policies_results, 'Week25.tar.gz')
