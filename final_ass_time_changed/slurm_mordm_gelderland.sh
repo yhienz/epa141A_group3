@@ -5,7 +5,7 @@
 #SBATCH --mail-user=y.hiensch@student.tudelft.nl
 #SBATCH --mail-type=all
 
-#SBATCH --time=18:00:00  # Adjust as needed
+#SBATCH --time=12:00:00  # Adjust as needed
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
