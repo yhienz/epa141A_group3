@@ -147,9 +147,9 @@ if __name__ == '__main__':
     constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(2):
+        for _ in range(3):
 
-            result = evaluator.optimize(nfe=2, searchover='levers',
+            result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
                                         epsilons=[1,1,1,1,1,0.1] , reference=ref_scenario,
                                         constraints = constraint)
@@ -165,11 +165,12 @@ if __name__ == '__main__':
 
 
     epsilons = [1,1,1,1,1,0.1]
+    print(results)
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file
-    results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
-    merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
+    #results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
+    #merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
 
     ### Gelderland Exploration
 
@@ -185,4 +186,4 @@ if __name__ == '__main__':
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    save_results(reference_policies_results, 'Week25.tar.gz')
+    #save_results(reference_policies_results, 'Week25.tar.gz')
