@@ -172,32 +172,19 @@ if __name__ == '__main__':
         "discount rate 3": 4.5,
         "discount rate 4": 4.5}
 
-    #BAD1
-    s2_values = {"Bmax": 200,
-        "Brate": 2,
-        "pfail": 0.9,
-        "ID flood wave shape": 123,
-        "planning steps": 5,
-        "discount rate 0": 2.5,
-        "discount rate 1": 2.5,
-        "discount rate 2": 1.5,
-        "discount rate 3": 1.5,
-        "discount rate 4": 1.5}
-
-    #BAD2
-    s3_values = {"Bmax": 175,
-                 "Brate": 1.5,
+    # BAD2
+    s3_values = {"Bmax": 200,
+                 "Brate": 2,
                  "pfail": 0.9,
-                 "ID flood wave shape": 34,
+                 "ID flood wave shape": 123,
                  "planning steps": 5,
                  "discount rate 0": 2.5,
-                 "discount rate 1": 2.5,
+                 "discount rate 1": 1.5,
                  "discount rate 2": 2.5,
-                 "discount rate 3": 2.5,
+                 "discount rate 3": 1.5,
                  "discount rate 4": 2.5}
 
-    scenarios = [ ref_scenario, create_scen(s3_values, 'Bad1'), create_scen(s2_values, 'Bad2'), create_scen(s1_values, 'Good1') ]
-
+    scenarios = [ref_scenario, create_scen(s3_values, 'Bad1'), create_scen(s1_values, 'Good1')]
 
     constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 500000000))]
 
