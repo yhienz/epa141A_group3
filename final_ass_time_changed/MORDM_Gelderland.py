@@ -146,7 +146,6 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
-    convergences =[]
     constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
@@ -154,21 +153,17 @@ if __name__ == '__main__':
 
             result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.05] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[1,1,1,1,1,1,0.1], reference=ref_scenario,
                                         constraints=constraint)
             y,t = result
             results.append(y)
             results_epsilon = pd.concat([results_epsilon, t])
-            results_outcomes = pd.concat([results_outcomes, y])
-
-            results.append(y)
-            convergences.append(t)
 
     # merge the results using a non-dominated sort
     problem = to_problem(model, searchover="levers")
 
     ##!! deze epsilons waarden moeten hetzelfde zijn als boven
-    epsilons = [0.05] * len(model.outcomes)
+    epsilons = [1,1,1,1,1,1,0.1]
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
 
@@ -178,7 +173,7 @@ if __name__ == '__main__':
 
     ### Gelderland Exploration
 
-    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policy_set = merged_archives.loc[~merged_archives.iloc[:, 1:51].duplicated()]
     policies = merged_archives.iloc[:,1:51]
     rcase_policies = []
 

@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
                 (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
-                                                         epsilons= [0.05] *len(model.outcomes),
+                                                         epsilons= [1,1,1,1,1,1,0.1],
                                                          reference=scenario, constraints=constraint2)
 
                 results.append(result)
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     for scenario in scenarios:
-        epsilons = [0.05, ] * len(model.outcomes)
+        epsilons = [1,1,1,1,1,1,0.1]
 
         # note that 100000 nfe is again rather low to ensure proper convergence
         resul = optimize(scenario, 50000, model, epsilons, constraint)
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     results_outcomes.to_csv("Gelderland_Multi_MORDM_outcomes.csv", index=False)
 
     ### Gelderland Exploration
-    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
     policies = results_outcomes.iloc[:,1:51]
 
     rcase_policies = []

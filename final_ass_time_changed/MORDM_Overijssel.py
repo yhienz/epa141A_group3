@@ -147,28 +147,33 @@ if __name__ == '__main__':
     constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
-        for _ in range(3):
+        for _ in range(2):
 
-            result = evaluator.optimize(nfe=20000, searchover='levers',
+            result = evaluator.optimize(nfe=2, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[0.05] * len(model.outcomes), reference=ref_scenario,
+                                        epsilons=[1,1,1,1,1,0.1] , reference=ref_scenario,
                                         constraints = constraint)
 
-    results_outcomes, results_epsilon = result
+            result_outcomes, result_epsilon = result
+            results.append(result_outcomes)
+
+            # epsilon values
+            results_epsilon = pd.concat([results_epsilon,result_epsilon ])
+
     # merge the results using a non-dominated sort
     problem = to_problem(model, searchover="levers")
 
 
-    epsilons = [0.05] * len(model.outcomes)
+    epsilons = [1,1,1,1,1,0.1]
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
     # Save the concatenated DataFrame to a CSV file
-    results_epsilon.to_csv('Week25_MORDM_epsilon_overijssel_PD7_.csv', index=False)
-    merged_archives.to_csv('Week25_MORDM_outcomes_overijssel_PD7_.csv', index=False)
+    results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
+    merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
 
     ### Gelderland Exploration
 
-    # policy_set = results_outcomes.loc[~results_outcomes.iloc[:, 1:51].duplicated()]
+    policy_set = merged_archives.loc[~merged_archives.iloc[:, 1:51].duplicated()]
     policies = merged_archives.iloc[:,1:51]
 
     rcase_policies = []
