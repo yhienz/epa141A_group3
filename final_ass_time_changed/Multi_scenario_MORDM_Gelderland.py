@@ -193,11 +193,11 @@ if __name__ == '__main__':
 
     def optimize(scenario, nfe, model, epsilons, constraint2):
         results = []
-        convergences = []
+        convergences = pd.DataFrame()
         problem = to_problem(model, searchover="levers")
 
         with MultiprocessingEvaluator(model) as evaluator:
-            for i in range(3):
+            for i in range(2):
                 convergence_metrics = [
                     ArchiveLogger(
                         "./archives",
@@ -215,7 +215,7 @@ if __name__ == '__main__':
                                                          reference=scenario, constraints=constraint2)
 
                 results.append(result)
-                convergences.append(convergence)
+                convergences = pd.concat([convergences, convergence])
 
         # merge the results using a non-dominated sort
         refer_set = epsilon_nondominated(results, epsilons, problem)
@@ -231,9 +231,10 @@ if __name__ == '__main__':
         epsilons = [1,1,1,1,1,1,0.1]
 
         # note that 100000 nfe is again rather low to ensure proper convergence
-        resul = optimize(scenario, 25000, model, epsilons, constraint)
+        resul = optimize(scenario, 2, model, epsilons, constraint)
 
         y, t = resul
+        print(t)
         # epsilon df
         results_epsilon = pd.concat([results_epsilon, t])
 
