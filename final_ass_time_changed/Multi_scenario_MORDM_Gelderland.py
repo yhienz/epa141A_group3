@@ -229,7 +229,7 @@ if __name__ == '__main__':
         epsilons = [1,1,1,1,1,1,0.1]
 
         # note that 100000 nfe is again rather low to ensure proper convergence
-        resul = optimize(scenario, 50000, model, epsilons, constraint)
+        resul = optimize(scenario, 25000, model, epsilons, constraint)
 
         y, t = resul
         results_epsilon = pd.concat([results_epsilon, t])
