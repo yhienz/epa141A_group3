@@ -191,7 +191,7 @@ if __name__ == '__main__':
 
     def optimize(scenario, nfe, model, epsilons, constraint2):
         results = []
-        convergences = []
+        convergences = pd.DataFrame()
         problem = to_problem(model, searchover="levers")
 
         with MultiprocessingEvaluator(model) as evaluator:
@@ -213,7 +213,7 @@ if __name__ == '__main__':
                                                          reference=scenario, constraints=constraint2)
 
                 results.append(result)
-                convergences.append(convergence)
+                convergences = pd.concat([convergences, convergence])
 
         # merge the results using a non-dominated sort
         refer_set = epsilon_nondominated(results, epsilons, problem)
