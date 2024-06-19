@@ -205,7 +205,7 @@ if __name__ == '__main__':
                     ),
                     EpsilonProgress(),
                 ]
-                #convergence_metrics = {EpsilonProgress()}
+
 
                 (result, convergence) = evaluator.optimize(nfe= nfe, searchover='levers',
                                                          convergence=convergence_metrics,
@@ -216,13 +216,15 @@ if __name__ == '__main__':
                 convergences.append(convergence)
 
         # merge the results using a non-dominated sort
-        reference_set = epsilon_nondominated(results, epsilons, problem)
+        refer_set = epsilon_nondominated(results, epsilons, problem)
+        reference_set = refer_set.loc[~refer_set.iloc[:, 1:51].duplicated()]
 
         return reference_set, convergences
 
 
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
+
     for scenario in scenarios:
         epsilons =  [1,1,1,1,1,0.1]
 
@@ -230,14 +232,21 @@ if __name__ == '__main__':
         resul = optimize(scenario, 25000, model, epsilons, constraint)
 
         y, t = resul
+
+        # epsilon df
         results_epsilon = pd.concat([results_epsilon, t])
+
+        #outcomes df
         results_outcomes = pd.concat([results_outcomes, y])
+
+    robust_results = results_outcomes[results_outcomes.iloc[:, 1:51].duplicated(keep=False)]
 
     results_epsilon.to_csv('Overijssel_Multi_MORDM_epsilon.csv', index=False)
     results_outcomes.to_csv("Overijssel_Multi_MORDM_outcomes.csv", index=False)
+    robust_results.to_csv("Overijssel_Multi_MORDM_outcomes_robust.csv", index=False)
 
     ### Overijssel Exploration
-    policies = results_outcomes.iloc[:,1:51]
+    policies = robust_results.iloc[:,1:51]
 
     rcase_policies = []
 
