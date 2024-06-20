@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-#SBATCH --job-name="Multi MORDM Overijssel"
+#SBATCH --job-name="good_multi Overijssel"
 #SBATCH --account=education-tpm-msc-epa
 #SBATCH --mail-user=y.hiensch@student.tudelft.nl
 #SBATCH --mail-type=all
 
-#SBATCH --time=24:00:00  # Adjust as needed
+#SBATCH --time=03:58:00  # Adjust as needed
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
@@ -54,8 +54,8 @@ else
 fi
 
 # Run the Python script
-python Multi_scenario_MORDM_Overijssel.py
-mpiexec -n 1 python3 Multi_scenario_MORDM_Overijssel.py
+python good_case_multi_ov.py
+mpiexec -n 1 python3 good_case_multi_ov.py
 
 # Deactivate the virtual environment
 deactivate
