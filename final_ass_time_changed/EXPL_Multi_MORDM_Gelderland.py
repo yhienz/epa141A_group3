@@ -129,7 +129,7 @@ if __name__ == '__main__':
     function = DikeNetwork()
 
     # Load policy set data
-    policy_set = pd.read_csv("Gelderland_Multi_MORDM_outcomes.csv")
+    policy_set = pd.read_csv("Outcomes/Gelderland_Multi_MORDM_outcomes.csv")
 
     # Select policies based on extreme values in specific columns
     policy_snip = []
