@@ -110,14 +110,14 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
     return model
 
 
-### GELDERLAND
+### Overijssel
 if __name__ == '__main__':
     dike_model, planning_steps = initialize_model()
 
     uncertainties = dike_model.uncertainties
     levers = dike_model.levers
 
-    model = problem_formulation_actor(6, uncertainties, levers)
+    model = problem_formulation_actor(7, uncertainties, levers)
 
     # Deepcopying the uncertainties and levers
     uncertainties = copy.deepcopy(dike_model.uncertainties)
@@ -126,18 +126,20 @@ if __name__ == '__main__':
     # Running the optimization for Overijssel
     function = DikeNetwork()
 
-    policy_set = pd.read_csv("Gelderland_Multi_MORDM_outcomes.csv")
+    policy_set = pd.read_csv("Overijssel Multi MORDM_Policies.csv")
 
-    # add column indicating under which scenario which policy was found
     policy_snip = []
-    for i in range(1, 8):
+    for i in range(2, 8):
         policy_snip.append(policy_set.iloc[:, -i].idxmin())
         policy_snip.append(policy_set.iloc[:, -i].idxmax())
+        # print(policy_set.columns[-i])
+
+    #len(policy_snip)
 
     pareto_df = policy_set
 
-    # Selecteer de laatste 7 kolommen (objectieven)
-    objective_columns = pareto_df.columns[-7:]
+    # Selecteer de kolommen met (objectieven)
+    objective_columns = pareto_df.columns[-7:-1]
 
     # Verdeel elke doelstelling in 3 segmenten en selecteer één oplossing uit elk segment
     selected_policies = pd.DataFrame()
@@ -158,8 +160,9 @@ if __name__ == '__main__':
     policy_snip2 = selected_policies.index.tolist()
 
     total_snip = policy_snip + policy_snip2
-    #len(total_snip)  # 35 = 14+21 dus klopt
+    len(total_snip)  # 30 = 12+18 dus klopt
     unique_snip = list(set(total_snip))
+    len(unique_snip)
 
     policies = policy_set.loc[unique_snip]
     policies = policies.iloc[:, 1:51]
@@ -172,4 +175,4 @@ if __name__ == '__main__':
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                                    rcase_policies)
-    save_results(reference_policies_results, 'MultiMORDM_Gelderland_big.tar.gz')
+    save_results(reference_policies_results, 'MultiMORDM_Overijssel_big.tar.gz')
