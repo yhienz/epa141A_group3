@@ -30,7 +30,8 @@ source venv/bin/activate
 python -m pip install --upgrade pip
 
 # Install necessary Python packages
-python -m pip install --upgrade --force-reinstall numpy==1.26.4
+#python -m pip install --upgrade --force-reinstall numpy==1.26.4
+python -m pip install --upgrade --force-reinstall numpy==1.23
 python -m pip install --upgrade ema_workbench
 python -m pip install ipyparallel
 python -m pip install networkx
@@ -55,7 +56,7 @@ fi
 
 # Run the Python script
 python EXPL_Multi_MORDM_Overijssel.py
-mpiexec -n 1 EXPL_Multi_MORDM_Overijssel.py
+mpiexec -n 1 python3 EXPL_Multi_MORDM_Overijssel.py
 
 # Deactivate the virtual environment
 deactivate

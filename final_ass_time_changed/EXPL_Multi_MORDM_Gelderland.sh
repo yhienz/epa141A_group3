@@ -55,7 +55,7 @@ fi
 
 # Run the Python script
 python EXPL_Multi_MORDM_Gelderland.py
-mpiexec -n 1 EXPL_Multi_MORDM_Gelderland.py
+mpiexec -n 1 python3 EXPL_Multi_MORDM_Gelderland.py
 
 # Deactivate the virtual environment
 deactivate
