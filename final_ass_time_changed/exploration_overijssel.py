@@ -148,17 +148,17 @@ if __name__ == '__main__':
     # Extract policy set and policies
     policy_set = merged_archives.loc[~merged_archives.iloc[:, 1:51].duplicated()]
     policies = policy_set.iloc[:, 1:51]
-
+    policies = policies.iloc[::4]
     rcase_policies = []
 
     for i, policy in policies.iterrows():
         rcase_policies.append(Policy(str(i), **policy.to_dict()))
 
-    n_scenarios = 10
-    with MultiprocessingEvaluator(model, n_processes=-1) as evaluator:
+    n_scenarios = 800
+    with MultiprocessingEvaluator(model,) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    save_results(reference_policies_results, 'Exploration_Gelderland.tar.gz')
+    save_results(reference_policies_results, 'Exploration_Overijssel.tar.gz')
 # Load the concatenated DataFrame from CSV files
 
 
