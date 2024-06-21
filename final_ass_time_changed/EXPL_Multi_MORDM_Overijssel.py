@@ -1,21 +1,19 @@
 # Import general python packages
 import pandas as pd
-#import numpy as np
 import copy
-#import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 # Import functions
 from dike_model_function import DikeNetwork  # @UnresolvedImport
 from problem_formulation import get_model_for_problem_formulation
 from problem_formulation import sum_over,time_step_0,time_step_1, time_step_2, time_step_3, time_step_4
-from sklearn.cluster import KMeans
+
 
 # Loading in the necessary modules for EMA workbench and functions
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome, TimeSeriesOutcome, ArrayOutcome)
 from ema_workbench.util import ema_logging
-from ema_workbench import save_results, load_results, Policy
+from ema_workbench import save_results, Policy
 from ema_workbench.em_framework.optimization import (EpsilonProgress)
 from ema_workbench.analysis import parcoords
 
@@ -110,30 +108,65 @@ def problem_formulation_actor(problem_formulation_actor, uncertainties, levers):
     return model
 
 
-### Overijssel
+def divide_into_segments(df, objective_column, n_segments=3):
+    """Divides the DataFrame into equal segments based on the objective column."""
+    df_sorted = df.sort_values(by=objective_column)
+    segment_length = len(df_sorted) // n_segments
+    selected_indices = [segment_length * i + segment_length // 2 for i in range(n_segments)]
+    return df_sorted.iloc[selected_indices]
+
 if __name__ == '__main__':
+    # Initialize model and planning steps
     dike_model, planning_steps = initialize_model()
 
-    uncertainties = dike_model.uncertainties
-    levers = dike_model.levers
-
-    model = problem_formulation_actor(7, uncertainties, levers)
-
-    # Deepcopying the uncertainties and levers
+    # Deepcopying the uncertainties and levers to avoid side-effects
     uncertainties = copy.deepcopy(dike_model.uncertainties)
     levers = copy.deepcopy(dike_model.levers)
 
-    # Running the optimization for Overijssel
+    # Defining the model
+    model = problem_formulation_actor(7, uncertainties, levers)
+
+    # Initialize the function for dike network
     function = DikeNetwork()
 
-    policies = pd.read_csv("Overijssel_Multi_MORDM_SLICING_policies.csv")
+    # Load policy set data
+    policy_set = pd.read_csv("./Outcomes/Overijssel Multi MORDM_Policies.csv")
 
+    # Select policies based on extreme values in specific columns
+    # Select policies based on extreme values in specific columns
+    policy_snip = [
+                      policy_set.iloc[:, -i].idxmin() for i in range(2, 8)
+                  ] + [
+                      policy_set.iloc[:, -i].idxmax() for i in range(2, 8)
+                  ]
+
+    # Selecting columns with objectives
+    objective_columns = policy_set.columns[-7:-1]
+
+    # Select one solution from each segment for each objective
+    selected_policies = pd.DataFrame()
+    for objective in objective_columns:
+        segment_policies = divide_into_segments(policy_set, objective)
+        selected_policies = pd.concat([selected_policies, segment_policies])
+
+    # Combine and ensure unique policies
+    policy_snip2 = selected_policies.index.tolist()
+    total_snip = policy_snip + policy_snip2
+    unique_snip = list(set(total_snip))
+
+    # Retrieve policies based on unique indices
+    policies = policy_set.loc[unique_snip]
+    policies = policies.iloc[:, 1:51]
+
+    # Convert policies to Policy instances
     rcase_policies = []
     for i, policy in policies.iterrows():
         rcase_policies.append(Policy(str(i), **policy.to_dict()))
 
+    # Run the experiment with the specified number of scenarios
     n_scenarios = 1000
     with MultiprocessingEvaluator(model) as evaluator:
-        reference_policies_results = evaluator.perform_experiments(n_scenarios,
-                                                                   rcase_policies)
+        reference_policies_results = evaluator.perform_experiments(n_scenarios, rcase_policies)
+
+    # Save the results
     save_results(reference_policies_results, 'MultiMORDM_Overijssel_big.tar.gz')

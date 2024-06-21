@@ -54,8 +54,8 @@ else
 fi
 
 # Run the Python script
-python good_case_multi_ov.py
-mpiexec -n 1 python3 good_case_multi_ov.py
+python MORDM.py
+mpiexec -n 1 python3 MORDM.py
 
 # Deactivate the virtual environment
 deactivate
