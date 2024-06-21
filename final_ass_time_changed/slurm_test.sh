@@ -5,7 +5,7 @@
 #SBATCH --mail-user=y.hiensch@student.tudelft.nl
 #SBATCH --mail-type=all
 
-#SBATCH --time=00:05:00
+#SBATCH --time=04:00:00
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
@@ -30,5 +30,5 @@ python -m pip install xlrd
 
 cp /path/to/your/custom/optimization.py venv/lib/python3.11/site-packages/ema_workbench/em_framework/optimization.py
 
-python MORDM_Gelderland2.py
-mpiexec -n 1 python3 MORDM_Gelderland2.py
+python EXPL_Multi_MORDM_Overijssel.py
+mpiexec -n 1 python3 EXPL_Multi_MORDM_Overijssel.py
