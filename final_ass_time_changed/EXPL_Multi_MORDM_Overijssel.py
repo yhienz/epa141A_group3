@@ -1,8 +1,8 @@
 # Import general python packages
 import pandas as pd
-import numpy as np
+#import numpy as np
 import copy
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Import functions
@@ -126,46 +126,7 @@ if __name__ == '__main__':
     # Running the optimization for Overijssel
     function = DikeNetwork()
 
-    policy_set = pd.read_csv("Overijssel Multi MORDM_Policies.csv")
-
-    policy_snip = []
-    for i in range(2, 8):
-        policy_snip.append(policy_set.iloc[:, -i].idxmin())
-        policy_snip.append(policy_set.iloc[:, -i].idxmax())
-        # print(policy_set.columns[-i])
-
-    #len(policy_snip)
-
-    pareto_df = policy_set
-
-    # Selecteer de kolommen met (objectieven)
-    objective_columns = pareto_df.columns[-7:-1]
-
-    # Verdeel elke doelstelling in 3 segmenten en selecteer één oplossing uit elk segment
-    selected_policies = pd.DataFrame()
-
-    for objective in objective_columns:
-        # Sorteer de Pareto-set op de huidige doelstelling
-        pareto_df_sorted = pareto_df.sort_values(by=objective)
-
-        # Verdeel de Pareto-set in 3 gelijke segmenten
-        indices = np.linspace(0, len(pareto_df_sorted) - 1, 4, dtype=int)
-
-        # Omzetten naar een enkele lijst van indices
-        selected_indices = (indices[:-1] + np.diff(indices) // 2).tolist()
-
-        # Selecteer de rijen met de geselecteerde indices en voeg toe aan selected_policies
-        selected_policies = pd.concat([selected_policies, pareto_df_sorted.iloc[selected_indices]])
-
-    policy_snip2 = selected_policies.index.tolist()
-
-    total_snip = policy_snip + policy_snip2
-    len(total_snip)  # 30 = 12+18 dus klopt
-    unique_snip = list(set(total_snip))
-    len(unique_snip)
-
-    policies = policy_set.loc[unique_snip]
-    policies = policies.iloc[:, 1:51]
+    policies = pd.read_csv("Overijssel_Multi_MORDM_SLICING_policies.csv")
 
     rcase_policies = []
     for i, policy in policies.iterrows():

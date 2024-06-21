@@ -30,8 +30,8 @@ source venv/bin/activate
 python -m pip install --upgrade pip
 
 # Install necessary Python packages
-#python -m pip install --upgrade --force-reinstall numpy==1.26.4
-python -m pip install --upgrade --force-reinstall numpy==1.23
+python -m pip install --upgrade --force-reinstall numpy==1.26.4
+#python -m pip install --upgrade --force-reinstall numpy==1.23
 python -m pip install --upgrade ema_workbench
 python -m pip install ipyparallel
 python -m pip install networkx
