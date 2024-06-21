@@ -5,7 +5,7 @@
 #SBATCH --mail-user=y.hiensch@student.tudelft.nl
 #SBATCH --mail-type=all
 
-#SBATCH --time=03:58:00  # Adjust as needed
+#SBATCH --time=02:58:00  # Adjust as needed
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
@@ -54,8 +54,8 @@ else
 fi
 
 # Run the Python script
-python bad_case_multi_G.py
-mpiexec -n 1 python3 bad_case_multi_G.py
+python EXPL_Multi_MORDM_Gelderland.py
+mpiexec -n 1 EXPL_Multi_MORDM_Gelderland.py
 
 # Deactivate the virtual environment
 deactivate
