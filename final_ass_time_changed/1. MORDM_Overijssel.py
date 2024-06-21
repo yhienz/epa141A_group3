@@ -5,14 +5,13 @@ import copy
 # Import functions
 from dike_model_function import DikeNetwork  # @UnresolvedImport
 from problem_formulation import get_model_for_problem_formulation
-from problem_formulation import (sum_over, time_step_0,time_step_1,
-                                 time_step_2, time_step_3, time_step_4)
+from problem_formulation import (sum_over, time_step_0,time_step_1)
 # Loading in the necessary modules for EMA workbench and functions
 from ema_workbench import (Model, MultiprocessingEvaluator, Scenario,
                            Constraint, ScalarOutcome)
 from ema_workbench.util import ema_logging
 from ema_workbench import Policy
-from ema_workbench import save_results, load_results
+from ema_workbench import save_results,  load_results
 from ema_workbench.em_framework.optimization import ArchiveLogger, EpsilonProgress
 from ema_workbench.em_framework.optimization import epsilon_nondominated, to_problem
 
@@ -132,7 +131,7 @@ if __name__ == '__main__':
     ref_scenario = Scenario('reference', **refcase_scen)
 
     ######### Overijssel
-    model = problem_formulation_actor(6, uncertainties, levers)
+    model = problem_formulation_actor(7, uncertainties, levers)
 
     # Deepcopying the uncertainties and levers
     uncertainties = copy.deepcopy(dike_model.uncertainties)
@@ -141,40 +140,41 @@ if __name__ == '__main__':
     # Running the optimization for Overijssel
     function = DikeNetwork()
     convergence_metrics = {EpsilonProgress()}
-    #constraint = [Constraint("Total period Costs", outcome_names= [f"{dike}_Expected Number of Deaths" for dike in function.dikelist], function=lambda x: max(0, x - 100000000))]
 
     results_epsilon = pd.DataFrame()  # Initialize an empty DataFrame
     results_outcomes = pd.DataFrame()
     results=[]
-    constraint = [Constraint("Total Costs", outcome_names='Total Costs', function=lambda x: max(0, x - 500000000))]
+    constraint = [Constraint("Total Costs", outcome_names= 'Total Costs', function=lambda x: max(0, x - 500000000))]
 
     with MultiprocessingEvaluator(model) as evaluator:
         for _ in range(3):
 
             result = evaluator.optimize(nfe=20000, searchover='levers',
                                         convergence=convergence_metrics,
-                                        epsilons=[1,1,1,1,1,1,0.1], reference=ref_scenario,
-                                        constraints=constraint)
-            y,t = result
-            results.append(y)
-            results_epsilon = pd.concat([results_epsilon, t])
+                                        epsilons=[1,1,1,1,1,0.1], reference=ref_scenario,
+                                        constraints = constraint)
+
+            result_outcomes, result_epsilon = result
+            results.append(result_outcomes)
+
+            # epsilon values
+            results_epsilon = pd.concat([results_epsilon, result_epsilon])
 
     # merge the results using a non-dominated sort
     problem = to_problem(model, searchover="levers")
 
-    ##!! deze epsilons waarden moeten hetzelfde zijn als boven
-    epsilons = [1,1,1,1,1,1,0.1]
+    epsilons = [1,1,1,1,1,0.1]
     merged_archives = epsilon_nondominated(results, epsilons, problem)
 
-
     # Save the concatenated DataFrame to a CSV file
-    results_epsilon.to_csv('Gelderland_MORDM_epsilon.csv', index=False)
-    merged_archives.to_csv('Gelderland_MORDM_outcomes.csv', index=False)
+    results_epsilon.to_csv('Overijssel MORDM_epsilon.csv', index=False)
+    merged_archives.to_csv('Overijssel_MORDM_Policies.csv', index=False)
 
     ### Gelderland Exploration
 
     policy_set = merged_archives.loc[~merged_archives.iloc[:, 1:51].duplicated()]
     policies = merged_archives.iloc[:,1:51]
+
     rcase_policies = []
 
     for i, policy in policies.iterrows():
@@ -184,4 +184,4 @@ if __name__ == '__main__':
     with MultiprocessingEvaluator(model) as evaluator:
         reference_policies_results = evaluator.perform_experiments(n_scenarios,
                                                 rcase_policies)
-    save_results(reference_policies_results, 'Week25_Gelderland.tar.gz')
+    save_results(reference_policies_results, 'Exploration_Overijssel.tar.gz')
